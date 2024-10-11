@@ -1,0 +1,24 @@
+{
+    "vMLConfigIDs": [
+        "FDDefault"
+    ],
+    "vMLModules": [
+        {
+            "id": "FDDefault",
+            "task": "FD",
+            "version": 100,
+            "modelName": "/mnt/c/anselInstallDir/FacialImaging/FaceDetection/OpenCVDNN/res10_300x300_ssd_iter_140000_fp16.caffemodel",
+			"cfg": "/mnt/c/anselInstallDir/FacialImaging/FaceDetection/OpenCVDNN/deploy.prototxt",
+            "vParams": {
+				"ConfidenceLevel": 0.51,
+                "ConfidenceLevel2": -1.0,
+                "IODMinFraction": 0.0,
+                "NNInputImageHeight": 300,
+                "NNInputImageWidth": 300,
+                "NNInputName": "data",
+                "NNMeanSubtraction": "[ 104.0, 177.0, 123.0 ]",
+                "NNOutputName": "detection_out"
+			}
+        }
+    ]
+}

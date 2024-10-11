@@ -1,0 +1,121 @@
+{
+    "vMLConfigIDs": [
+        "FDDefault",
+        "FFDefault",
+        "EDDefault"
+    ],
+    "vMLModules": [
+        {
+            "ID": "FDDefault",
+            "Interface": "FaceDetectorInterface",
+            "Name": "OpenCVDNN",
+            "Version": 100,
+            "vFileNames": [
+                "C:\\anselInstallDir\\FacialImaging\\FaceDetection\\OpenCVDNN\\res10_300x300_ssd_iter_140000_fp16.caffemodel",
+                "C:\\anselInstallDir\\FacialImaging\\FaceDetection\\OpenCVDNN\\deploy.prototxt"
+            ],
+            "vParamTriplets": [
+                {"param_name": "ConfidenceLevel", "value": 0.51, "data_type": "double"},
+                {"param_name": "ConfidenceLevel2", "value": -1.0, "data_type": "double"},
+                {"param_name": "IODMinFraction", "value": 0.0, "data_type": "double"},
+                {"param_name": "NNInputImageHeight", "value": 300, "data_type": "int"},
+                {"param_name": "NNInputImageWidth", "value": 300, "data_type": "int"},
+                {"param_name": "NNInputName", "value": "data", "data_type": "string"},
+                {"param_name": "NNMeanSubtraction", "value": "[ 104.0, 177.0, 123.0 ]", "data_type": "vector<double>"},
+                {"param_name": "NNOutputName", "value": "detection_out", "data_type": "string"}
+            ]
+        },
+        {
+            "ID": "FFDefault",
+            "Interface": "FacialFeatureInterface",
+            "Name": "Dlib",
+            "Version": 100,
+            "vFileNames": [
+                "C:\\anselInstallDir\\FacialImaging\\FacialFeature\\dlib\\shape_predictor_68_face_landmarks.dat"
+            ],
+            "vParamTriplets": [
+                {"param_name": "FaceDetectionSource", "value": "OpenCVDNN", "data_type": "string"}
+            ],
+            "vMLConfigIDsUsed": [
+                "FPDefault",
+                "MODefault",
+                "SMDefault",
+                "GADefault"
+            ]
+        },
+        {
+            "ID": "FPDefault",
+            "Interface": "FacePoseInterface",
+            "Name": "OpenCVDNN",
+            "Version": 100,
+            "vFileNames": [
+                "C:\\anselInstallDir\\FacialImaging\\FacialFeature\\OpenCVDNN\\FacePoseModel1.pb",
+                "C:\\anselInstallDir\\FacialImaging\\FacialFeature\\OpenCVDNN\\FacePoseModel1MSD.csv"
+            ],
+            "vParamTriplets": [
+                {"param_name": "NNInputName", "value": "dense_input", "data_type": "string"},
+                {"param_name": "NNOutputName", "value": "dense_3/MatMul", "data_type": "string"}
+            ]
+        },
+        {
+            "ID": "MODefault",
+            "Interface": "MouthOpenInterface",
+            "Name": "OpenCVDNN",
+            "Version": 200,
+            "vFileNames": [
+                "C:\\anselInstallDir\\FacialImaging\\FacialFeature\\OpenCVDNN\\MouthOpenModel2.pb"
+            ],
+            "vParamTriplets": [
+                {"param_name": "NNInputName", "value": "input_2", "data_type": "string"},
+                {"param_name": "NNInputImageWidth", "value": 224, "data_type": "int"},
+                {"param_name": "NNInputImageHeight", "value": 224, "data_type": "int"},
+                {"param_name": "NNImageNormalization", "value": 0.00392156862745098, "data_type": "double"}
+            ]
+        },
+        {
+            "ID": "SMDefault",
+            "Interface": "SmileInterface",
+            "Name": "OpenCVDNN",
+            "Version": 200,
+            "vFileNames": [
+                "C:\\anselInstallDir\\FacialImaging\\FacialFeature\\OpenCVDNN\\SmileModel2.pb"
+            ],
+            "vParamTriplets": [
+                {"param_name": "NNInputName", "value": "input_2", "data_type": "string"},
+                {"param_name": "NNInputImageWidth", "value": 224, "data_type": "int"},
+                {"param_name": "NNInputImageHeight", "value": 224, "data_type": "int"},
+                {"param_name": "NNImageNormalization", "value": 0.00392156862745098, "data_type": "double"}
+            ]
+        },
+        {
+            "ID": "GADefault",
+            "Interface": "GazeInterface",
+            "Name": "OpenCVDNN",
+            "Version": 200,
+            "vFileNames": [
+                "C:\\anselInstallDir\\FacialImaging\\FacialFeature\\OpenCVDNN\\GazeModel2.pb"
+            ],
+            "vParamTriplets": [
+                {"param_name": "NNInputName", "value": "input_2", "data_type": "string"},
+                {"param_name": "NNInputImageWidth", "value": 120, "data_type": "int"},
+                {"param_name": "NNInputImageHeight", "value": 80, "data_type": "int"},
+                {"param_name": "NNImageNormalization", "value": 1.0, "data_type": "double"}
+            ]
+        },
+        {
+            "ID": "EDDefault",
+            "Interface": "EyeglassesDetectionInterface",
+            "Name": "OpenCVDNN",
+            "Version": 100,
+            "vFileNames": [
+                "C:\\anselInstallDir\\FacialImaging\\EyeglassesDetection\\EyeglassesDetectionNNModel_v1.pb"
+            ],
+            "vParamTriplets": [
+                {"param_name": "NNInputName", "value": "input", "data_type": "string"},
+                {"param_name": "NNOutputName", "value": "cross_", "data_type": "string"},
+                {"param_name": "NNInputImageWidth", "value": 160, "data_type": "int"},
+                {"param_name": "NNInputImageHeight", "value": 160, "data_type": "int"}
+            ]
+        }
+    ]
+}
