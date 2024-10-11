@@ -1,18 +1,22 @@
 #ifndef FACEDETECTOR_H
 #define FACEDETECTOR_H
 
+#include "KAITaskInterface.h"
+
 #include <opencv2/dnn.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
 #include <string>
 
-class FaceDetector {
+class FaceDetector: public KAITask {
 public:
     FaceDetector(const std::string& modelPath, const std::string& configPath,
                 short backendId = 0, short targetId = 0);
         
-    void detectFaces(const cv::Mat& image);
+    void run(Image& img) override;
+    
+    void detectFaces(Image& image);
 
     void setInputName(const std::string name){
         inputName = name;

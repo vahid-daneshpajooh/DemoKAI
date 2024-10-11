@@ -14,15 +14,30 @@ find_package(OpenCV REQUIRED)
 
 # Add source files
 set(SOURCES
-	KAI-impl.cpp
-	KAITaskManager.cpp
+	KAI-impl.cpp # main implementation
+
+	KAITaskManager.cpp  # KAI task manager
+	KAITaskPipeline.cpp # KAI pipeline
+
+	# KAI tasks
     FaceDetector.cpp
 )
 
 # Add header files
 set(HEADERS
-	KAITaskManager.h
+
+	KAITaskManager.h   # KAI task manager
+	KAITaskPipeline.h  # KAI pipeline
+	KAITaskInterface.h # KAI task interface
+
+	# KAI tasks
 	FaceDetector.h
+
+	# KAI utils
+	MLConfigLoader.h 	# ML Config Loader
+	argparser.h 		# input argument parser
+	Image.h				# Image class
+
 )
 
 # Include OpenCV headers

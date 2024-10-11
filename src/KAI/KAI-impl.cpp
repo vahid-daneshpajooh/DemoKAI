@@ -1,50 +1,36 @@
 #include <iostream>
 #include <fstream>
 
-// #include <opencv2/opencv.hpp>
-#include <nlohmann/json.hpp>
+#include "argparser.h"
+//#include <nlohmann/json.hpp>
 
+#include "Image.h"
 #include "KAITaskManager.h"
 
-using json = nlohmann::json;
+// using json = nlohmann::json;
 
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        std::cerr << "[KAI Task Manager]-- Usage: " << argv[0] << " <image_path> <json_path>" << std::endl;
-        return 1;
-    }
+    
+    parseArguments(argc, argv);
 
-    // Read image
-    std::string imagePath = argv[1];
-    cv::Mat image = cv::imread(imagePath);
-    if (image.empty()) {
-        std::cerr << "[KAI Task Manager]-- Error: Could not open or find the image!" << std::endl;
-        return 1;
-    }
+    std::string img_path = parser_getImagePath();
+    std::string json_path = parser_getJSONPath();
 
-    // Read JSON file
-    std::string jsonPath = argv[2];
-    std::ifstream jsonFile(jsonPath);
-    if (!jsonFile.is_open()) {
-        std::cerr << "[KAI Task Manager]-- Error: Could not open the MLConfig JSON file!" << std::endl;
-        return EXIT_FAILURE;
-    }
+    // TODO assert that it was provided
+    std::string output_path = parser_getOutputPath();
 
-    // Read output path for image
-    std::string outputPath = argv[3];
+    // Run KAI Task Manager
+    KAITaskManager kaiTaskManager;
+    kaiTaskManager.loadMLConfigs(json_path);
 
-    // TODO: arg parse option for batch processing
-    //       e.g., provide folder and image extensions to process
-
-    // Run KAIWrapper
-    KAITaskManager kaiTaskManager_(jsonPath, imagePath);
-    kaiTaskManager_.init();
-
+    Image img(img_path);
+    kaiTaskManager.runTasks(img);
     // diagnostic
     cv::Mat outMat;
-    kaiTaskManager_.printOutput(outMat);
-    if(!outMat.empty())
-        cv::imwrite(outputPath, outMat);
+    img.getImage_faceOn(outMat);
+
+    if(!outMat.empty() && !output_path.empty())
+        cv::imwrite(output_path, outMat);
 
     std::cout << "[KAI Task Manager]-- Process completed successfully!" << std::endl;
     return EXIT_SUCCESS;

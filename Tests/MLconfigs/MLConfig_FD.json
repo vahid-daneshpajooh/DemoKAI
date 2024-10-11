@@ -9,6 +9,7 @@
             "version": 100,
             "modelName": "/mnt/c/anselInstallDir/FacialImaging/FaceDetection/OpenCVDNN/res10_300x300_ssd_iter_140000_fp16.caffemodel",
 			"cfg": "/mnt/c/anselInstallDir/FacialImaging/FaceDetection/OpenCVDNN/deploy.prototxt",
+			"precedence": 1,
             "vParams": {
 				"ConfidenceLevel": 0.51,
                 "ConfidenceLevel2": -1.0,
