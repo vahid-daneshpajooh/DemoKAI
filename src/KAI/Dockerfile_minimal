@@ -1,0 +1,28 @@
+# This is Dockerfile to create a minimal image
+# It won't copy the src code or compile it
+# It only copy the binary and minimal dependencies
+# /app
+#     ├── build
+#     │   ├── libKPTClassic.a
+#     │   └── KPTClassicImpl
+#     │   └── test.jpg
+#     └── anselInstallDir
+#         └── dataPathItems
+#         └── anselCacheDir
+   
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+# avoid libopencv-dev asking for timezone
+ENV DEBIAN_FRONTEND noninteractive
+
+# Set the working directory
+WORKDIR /app/build
+RUN apt-get -y update
+RUN apt-get -y install libopencv-dev
+
+# copy only minimal files to working directory
+COPY binary/libKPTClassic.a ./
+COPY binary/KPTClassicImpl ./
+COPY binary/test.jpg ./
+COPY anselInstallDir ../anselInstallDir

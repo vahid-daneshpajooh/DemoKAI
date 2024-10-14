@@ -1,0 +1,18 @@
+version: '3'
+services:
+  kai:
+    image: kai 
+    #entrypoint:
+    #  - "python /app/Demo.py"
+    environment:
+      - IMAGE_FILE_IN=/app/output/input/100_0384.JPG
+      - IMAGE_FILE_OUT=/app/output/output/100_0384_KPT.JPG
+    volumes:
+      - type: bind
+        source: ./../Tests
+        target: /app/output
+      - type: bind
+        source: /mnt/c/anselInstallDir # parent folder of Facial Imaging Dir
+        target: /app/libs
+    ports:
+      - "7860:7860"

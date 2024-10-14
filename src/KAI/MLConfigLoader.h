@@ -132,18 +132,11 @@ public:
         for (const auto& configID : vMLConfigIDs) {
             MLModule* module = findMLModule(vMLModules, configID);
             if (module) {
-                std::cout << "Found MLModule for configID " << configID << ":\n";
+                std::cout << "Found MLModule for task " << module->task << ":\n";
                 std::cout << "--id: " << module->id << "\n";
-                std::cout << "--task: " << module->task << "\n";
                 std::cout << "--version: " << module->version << "\n";
-                /*
-                std::cout << "\nParameters: ";
-                for (const auto& param : module->vParams) {
-                    std::cout << param.first << ": " << param.second << " ";
-                }
-                */
 
-                std::cout << "\n\n";
+                std::cout << "\n";
             } 
             else {
                 std::cout << "No MLModule found for configID " << configID << "\n";
