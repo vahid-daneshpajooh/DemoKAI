@@ -25,15 +25,13 @@ void KAITaskManager::loadMLConfigs(const std::string config_path)
             // read model and cfg files (*.caffemodel and *.prototxt)
             std::string modelPath = module.modelName;
             std::string cfgPath = module.cfg;
+            FaceDetector* pFaceDetector = new FaceDetector(modelPath, cfgPath);
 
-            // TODO: read other task specific params;
-            // 1) confidence level1 and level2,
-            // 2) input image h and w,
-            // 3) input and output layer names,
-            // 4) image mean subtraction array,
-            // ...
+            // read other task specific params and initialize model
+            auto params = module.params;
+            pFaceDetector->init(params);
 
-            task = std::make_unique<FaceDetector>(modelPath, cfgPath);
+            task = std::unique_ptr<KAITask>(pFaceDetector);
         }
         else if(str_task == "FF"){
             // TODO: add facial feature point extraction class

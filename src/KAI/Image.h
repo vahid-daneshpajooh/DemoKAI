@@ -14,14 +14,13 @@ public:
         imgMat.copyTo(outMat);
     }
 
-    std::vector<cv::Rect> getImage_faceBboxes(){
+    std::vector<std::pair<cv::Rect, float>> getImage_faceBboxes(){
         return faceBboxes;
     }
 
-    void setImage_faceBboxes(const std::vector<cv::Rect> bboxes){
+    void setImage_faceBboxes(const std::vector<std::pair<cv::Rect, float>>& bboxes){
         // clear current vector elements
         faceBboxes.clear();
-
         faceBboxes = bboxes;
     }
     
@@ -37,17 +36,17 @@ public:
 private:
     cv::Mat imgMat;
 
-    // Store face bounding boxes (x, y, width, height)
-    std::vector<cv::Rect> faceBboxes;
-
+    // Face Detection results
+    // bounding boxes (x, y, width, height) and confidence scores
+    std::vector<std::pair<cv::Rect, float>> faceBboxes;
 
     // util functions
     void overlayFaceOnImage(cv::Mat& overlayImg){
         for(const auto& faceBox: faceBboxes){
-            cv::rectangle(overlayImg, faceBox, cv::Scalar(45, 255, 45), 2, 4);
-            // TODO: requires saving confidence score in Image when running AI Task
-            // cv::putText(imgMat, std::to_string(static_cast<int>(confidence*100)),
-            //cv::Point(x1+2, y1-5), cv::FONT_HERSHEY_SIMPLEX, 0.5, (45, 45, 255), 2);
+            cv::rectangle(overlayImg, faceBox.first, cv::Scalar(45, 255, 45), 2, 4);
+            cv::putText(overlayImg, std::to_string(static_cast<int>(faceBox.second*100)),
+                        cv::Point(faceBox.first.x+2, faceBox.first.y-5),
+                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 45, 45), 2);
         }
     }
 };

@@ -6,7 +6,7 @@ cmake_minimum_required (VERSION 3.13)
 project(DemoKAI)
 
 # Set C++ standard to 14
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find OpenCV package
@@ -37,6 +37,7 @@ set(HEADERS
 	MLConfigLoader.h 	# ML Config Loader
 	argparser.h 		# input argument parser
 	Image.h				# Image class
+	Types.h				# supported types 
 
 )
 

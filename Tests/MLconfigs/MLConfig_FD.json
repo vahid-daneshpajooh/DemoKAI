@@ -11,14 +11,14 @@
 			"cfg": "/mnt/c/anselInstallDir/FacialImaging/FaceDetection/OpenCVDNN/deploy.prototxt",
 			"precedence": 1,
             "vParams": {
-				"ConfidenceLevel": 0.51,
-                "ConfidenceLevel2": -1.0,
-                "IODMinFraction": 0.0,
-                "NNInputImageHeight": 300,
-                "NNInputImageWidth": 300,
-                "NNInputName": "data",
-                "NNMeanSubtraction": "[ 104.0, 177.0, 123.0 ]",
-                "NNOutputName": "detection_out"
+				"ConfidenceLevel": [0.51, "float"],
+                "ConfidenceLevel2": [-1.0, "float"],
+                "IODMinFraction": [0.0, "float"],
+                "NNInputImageHeight": [300, "int"],
+                "NNInputImageWidth": [300, "int"],
+                "NNInputName": ["data", "string"],
+                "NNMeanSubtraction": ["[ 104.0, 177.0, 123.0 ]", "vector<float>"],
+                "NNOutputName": ["detection_out", "string"]
 			}
         }
     ]
