@@ -25,9 +25,14 @@ int main(int argc, char** argv) {
 
     Image img(img_path);
     kaiTaskManager.runTasks(img);
-    // diagnostic
+    
+    // print results on image
     cv::Mat outMat;
+    
+    // draw faces
     img.getImage_faceOn(outMat);
+    // draw facial landmarks
+    img.getImage_faceFeaturesOn(outMat);
 
     if(!outMat.empty() && !output_path.empty())
         cv::imwrite(output_path, outMat);

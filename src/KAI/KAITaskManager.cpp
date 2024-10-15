@@ -1,5 +1,6 @@
 #include "KAITaskManager.h"
 #include "FaceDetector.h"
+#include "FacialFeatureDetector.h"
 
 #include <iostream>
 #include <fstream>
@@ -21,10 +22,12 @@ void KAITaskManager::loadMLConfigs(const std::string config_path)
         std::unique_ptr<KAITask> task;
 
         std::string str_task = module.task;
-        if(str_task == "FD"){
+        if(str_task == "FaceDetection"){
             // read model and cfg files (*.caffemodel and *.prototxt)
             std::string modelPath = module.modelName;
             std::string cfgPath = module.cfg;
+            
+            // pass model to constructor
             FaceDetector* pFaceDetector = new FaceDetector(modelPath, cfgPath);
 
             // read other task specific params and initialize model
@@ -33,8 +36,11 @@ void KAITaskManager::loadMLConfigs(const std::string config_path)
 
             task = std::unique_ptr<KAITask>(pFaceDetector);
         }
-        else if(str_task == "FF"){
-            // TODO: add facial feature point extraction class
+        else if(str_task == "FacialFeatures"){
+            // read model Dlib file (*.dat)
+            std::string modelPath = module.modelName;
+            // pass model to constructor
+            task = std::make_unique<FacialFeatureDetector>(modelPath);
         }
 
         if(task){
