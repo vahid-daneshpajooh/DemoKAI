@@ -21,6 +21,7 @@ set(SOURCES
 
 	# KAI tasks
     FaceDetector.cpp
+	FacialFeatureDetector.cpp
 )
 
 # Add header files
@@ -32,14 +33,25 @@ set(HEADERS
 
 	# KAI tasks
 	FaceDetector.h
+	FacialFeatureDetector.h
 
 	# KAI utils
 	MLConfigLoader.h 	# ML Config Loader
 	argparser.h 		# input argument parser
+	
 	Image.h				# Image class
+	FacialFeatures.h
 	Types.h				# supported types 
 
 )
+
+
+# add dlib library as subdirectory
+set(DLIB_NO_GUI_SUPPORT ON) # turn off GUI support
+set(USE_AVX_INSTRUCTIONS 1) # enable CPU AVX (advanced vector extensions)
+
+add_subdirectory(dlib)
+
 
 # Include OpenCV headers
 include_directories(
@@ -50,4 +62,4 @@ include_directories(
 add_executable(KAI-impl ${SOURCES} ${HEADERS})
 
 # Link OpenCV libraries
-target_link_libraries(KAI-impl ${OpenCV_LIBS})
+target_link_libraries(KAI-impl ${OpenCV_LIBS} dlib::dlib)
