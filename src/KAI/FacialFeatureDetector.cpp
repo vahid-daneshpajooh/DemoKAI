@@ -11,6 +11,7 @@ void FacialFeatureDetector::run(Image& image) {
     dlib::cv_image<dlib::bgr_pixel> dlibImage = convertToDlibImage(image);
 
     // Loop through detected face bounding boxes
+    std::vector<FacialFeatures> vFeatures;
     for (const auto& [faceBox, conf] : image.getImage_faceBboxes()) {
         
         dlib::rectangle dlibRect(faceBox.x, faceBox.y, faceBox.x + faceBox.width, faceBox.y + faceBox.height);
@@ -22,9 +23,10 @@ void FacialFeatureDetector::run(Image& image) {
         FacialFeatures features;
         features.setFacialLandmarks(landmarks);
 
-        // Store FFeatures in image
-        image.setFacialFeatures(features);
+        vFeatures.push_back(features);
     }
+    // Keep Facial Features with image
+    image.setFacialFeatures(vFeatures);
 }
 
 dlib::cv_image<dlib::bgr_pixel> FacialFeatureDetector::convertToDlibImage(Image& image) {

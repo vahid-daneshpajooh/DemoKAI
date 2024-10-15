@@ -25,8 +25,10 @@ public:
         faceBboxes = bboxes;
     }
 
-    void setFacialFeatures(FacialFeatures features){
-        facialFeatures = features;
+    void setFacialFeatures(std::vector<FacialFeatures> features){
+        // clear current vector elements
+        vFacialFeatures.clear();
+        vFacialFeatures = features;
     }
 
     /*
@@ -67,7 +69,8 @@ private:
     std::vector<std::pair<cv::Rect, float>> faceBboxes;
 
     // Facial Features (landmarks, smile, gaze, eyeglasses, etc)
-    FacialFeatures facialFeatures;
+    // (for all detected faces)
+    std::vector<FacialFeatures> vFacialFeatures;
 
     // visualization utility functions
 
@@ -84,9 +87,15 @@ private:
     // Draw facial landmarks on detected faces
     void overlayFaceLandmarkOnImage(cv::Mat& overlayImg){
         
-        auto vFFeatures = facialFeatures.getFacialLandmarks();
-        for (const auto& feature: vFFeatures){
-            cv::circle(overlayImg, cv::Point(feature.mX, feature.mY), 2, cv::Scalar(45, 255, 45), 2);
+        // get FacialFeatures class for each face detected in image
+        for(const auto& faceFeatures: vFacialFeatures){
+            // get facial landmarks (e.g., eye, lip, nose corners)
+            auto landmarks = faceFeatures.getFacialLandmarks();
+
+            // draw a circle to show each landmark on the face
+            for (const auto& landmark: landmarks){
+                cv::circle(overlayImg, cv::Point(landmark.mX, landmark.mY), 2, cv::Scalar(45, 255, 45), 2);
+            }
         }
     }
 };
