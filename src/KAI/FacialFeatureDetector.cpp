@@ -21,7 +21,7 @@ void FacialFeatureDetector::run(Image& image) {
 
         // extract main facial landmarks (e.g., eye, nose, lips corners)
         FacialFeatures features;
-        features.setFacialLandmarks(landmarks);
+        features.setFFeaturesFromDlib(landmarks);
 
         vFeatures.push_back(features);
     }

@@ -11,7 +11,10 @@
 
 int main(int argc, char** argv) {
     
-    parseArguments(argc, argv);
+    int Failed = parseArguments(argc, argv);
+    if (Failed) {
+        return EXIT_FAILURE;
+    }
 
     std::string img_path = parser_getImagePath();
     std::string json_path = parser_getJSONPath();

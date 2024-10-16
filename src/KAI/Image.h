@@ -31,12 +31,6 @@ public:
         vFacialFeatures = features;
     }
 
-    /*
-    void addFacialLandmarks(const FFeatureLocation& ffLocs){
-
-    }
-    */
-
     void getImage_faceOn(cv::Mat& outMat){
         if (imgMat.empty()){
             return;
@@ -59,6 +53,7 @@ public:
         }
         
         overlayFaceLandmarkOnImage(outMat);
+        overlayFaceFeaturesOnImage(outMat);
     }
 
 private:
@@ -71,8 +66,10 @@ private:
     // Facial Features (landmarks, smile, gaze, eyeglasses, etc)
     // (for all detected faces)
     std::vector<FacialFeatures> vFacialFeatures;
-
+    
+    //////////////////////////////////
     // visualization utility functions
+    //////////////////////////////////
 
     // Draw rectangle around detected faces
     void overlayFaceOnImage(cv::Mat& overlayImg){
@@ -94,7 +91,24 @@ private:
 
             // draw a circle to show each landmark on the face
             for (const auto& landmark: landmarks){
+                // cv::Scalar(45, 255, 45) -> green
                 cv::circle(overlayImg, cv::Point(landmark.mX, landmark.mY), 2, cv::Scalar(45, 255, 45), 2);
+            }
+        }
+    }
+
+    // Draw ALL detected facial feature points
+    void overlayFaceFeaturesOnImage(cv::Mat& overlayImg){
+        
+        // get FacialFeatures class for each face detected in image
+        for(const auto& faceFeatures: vFacialFeatures){
+            // get facial landmarks (e.g., eye, lip, nose corners)
+            auto landmarks = faceFeatures.getFacialFeatures();
+
+            // draw a circle to show each landmark on the face
+            for (const auto& point: landmarks){
+                // cv::Scalar(255, 45, 45) -> blue
+                cv::circle(overlayImg, point, 1, cv::Scalar(255, 45, 45), 1);
             }
         }
     }

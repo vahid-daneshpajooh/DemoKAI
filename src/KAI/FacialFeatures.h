@@ -2,6 +2,7 @@
 #define FACIALFEATURES_H
 
 #include <dlib/image_processing.h>
+#include <opencv2/core/types.hpp>
 
 #include <string>
 
@@ -113,22 +114,25 @@ public:
         }
     }
 
+    // landmarks, including (eye, mouth, nose) left/right corners and center
     std::vector<FFeatureLocation>  getFacialLandmarks() const {
         return FFlocs;
     };
 
-    void setFacialLandmarks(const dlib::full_object_detection& landmarks){
+    // get all available facial feature points
+    std::vector<cv::Point> getFacialFeatures() const {
+        return vFFpoints;
+    }
 
-        // Map the specific landmark points to facial feature locations
-        FFlocs[FFeatureLocation::FFLeftEyeLeftCorner] = FFeatureLocation(landmarks.part(36).x(), landmarks.part(36).y());
-        FFlocs[FFeatureLocation::FFLeftEyeRightCorner] = FFeatureLocation(landmarks.part(39).x(), landmarks.part(39).y());
-        FFlocs[FFeatureLocation::FFRightEyeLeftCorner] = FFeatureLocation(landmarks.part(42).x(), landmarks.part(42).y());
-        FFlocs[FFeatureLocation::FFRightEyeRightCorner] = FFeatureLocation(landmarks.part(45).x(), landmarks.part(45).y());
-        FFlocs[FFeatureLocation::FFMouthLeftCorner] = FFeatureLocation(landmarks.part(48).x(), landmarks.part(48).y());
-        FFlocs[FFeatureLocation::FFMouthRightCorner] = FFeatureLocation(landmarks.part(54).x(), landmarks.part(54).y());
-        FFlocs[FFeatureLocation::FFNoseLeftSide] = FFeatureLocation(landmarks.part(31).x(), landmarks.part(31).y());
-        FFlocs[FFeatureLocation::FFNoseRightSide] = FFeatureLocation(landmarks.part(35).x(), landmarks.part(35).y());
+    void setFFeaturesFromDlib(const dlib::full_object_detection& landmarks){
+        
+        vFFpoints.clear();
+        for (int i = 0; i < landmarks.num_parts(); ++i) {
+            vFFpoints.push_back(cv::Point(landmarks.part(i).x(), landmarks.part(i).y()));
+        }
 
+        // save specific FFpoints as facial landmarks
+        setFacialLandmarksFromDlib(landmarks);
     }
 
     // Methods to handle additional features (e.g., smile detection, eye state)
@@ -145,8 +149,28 @@ private:
     // Other possible facial features
     bool smileDetected;
 
-    // facial feature locations
-    std::vector<FFeatureLocation> FFlocs; //[FFeatureLocation::FFNCommonFeatures];
+    // facial feature points
+    // e.g., 68 for Dlib model
+    std::vector<cv::Point> vFFpoints;
+
+    // Facial landmarks (eyes, nose, mouth)
+    std::vector<FFeatureLocation> FFlocs;
+
+    ///
+    // helper functions
+    ///
+
+    // Map the specific landmark points to facial feature locations
+    void setFacialLandmarksFromDlib(const dlib::full_object_detection& landmarks) {
+        FFlocs[FFeatureLocation::FFLeftEyeLeftCorner] = FFeatureLocation(landmarks.part(36).x(), landmarks.part(36).y());
+        FFlocs[FFeatureLocation::FFLeftEyeRightCorner] = FFeatureLocation(landmarks.part(39).x(), landmarks.part(39).y());
+        FFlocs[FFeatureLocation::FFRightEyeLeftCorner] = FFeatureLocation(landmarks.part(42).x(), landmarks.part(42).y());
+        FFlocs[FFeatureLocation::FFRightEyeRightCorner] = FFeatureLocation(landmarks.part(45).x(), landmarks.part(45).y());
+        FFlocs[FFeatureLocation::FFMouthLeftCorner] = FFeatureLocation(landmarks.part(48).x(), landmarks.part(48).y());
+        FFlocs[FFeatureLocation::FFMouthRightCorner] = FFeatureLocation(landmarks.part(54).x(), landmarks.part(54).y());
+        FFlocs[FFeatureLocation::FFNoseLeftSide] = FFeatureLocation(landmarks.part(31).x(), landmarks.part(31).y());
+        FFlocs[FFeatureLocation::FFNoseRightSide] = FFeatureLocation(landmarks.part(35).x(), landmarks.part(35).y());
+    }
 };
 
 #endif // FACIALFEATURES_H

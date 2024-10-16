@@ -8,7 +8,7 @@ FaceDetector::FaceDetector(const std::string& modelPath,
 
     faceNet_ = cv::dnn::readNetFromCaffe(configPath, modelPath);
     if (faceNet_.empty()){
-        throw std::runtime_error("Error loading face detection model");
+        throw std::runtime_error("Face Detection Task -- Error loading the model.");
     }
 
     /*{ backend Id    | 0 | Choose one of computation backends:
