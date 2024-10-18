@@ -18,13 +18,29 @@ public:
     void run(Image& image) override;
     
 private:
+    
+    /////////////////
+    // network params
+    //////////////////
+
+    // input size
+    cv::Size net_inputSize = cv::Size(500, 500);
+
+    // Dlib inference head
     dlib::shape_predictor landmarkPredictor;
+
 
     ///
     // Helper functions
     ///
 
-    // convert OpenCV Image to Dlib Image
-    dlib::cv_image<dlib::bgr_pixel> convertToDlibImage(Image& image);
+    // scale Dlib model's predictions to actual image size
+    void adjustLandmarksScale(dlib::full_object_detection& landmarks, float scale, const cv::Size& out_size);
+
+    // resize image and maintain aspect ratio
+    float resizeImage(const cv::Mat& src, cv::Mat& dst, const cv::Size& out_size);
+
+    // scale face bbox coordinates
+    void scaleCoordinates(cv::Point& point, float scale, bool pyrUp, const cv::Size& img_size);
 };
 #endif // FACIALFEATUREDETECTOR_H
