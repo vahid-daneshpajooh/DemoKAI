@@ -74,6 +74,15 @@ Dlib facial landmarks
     // -1 for unknown
 	float	mConfidence;
 
+    // methods for computing the landmark centers
+    void findLandmarkCenter(FFeatureLocation leftCorner, FFeatureLocation rightCorner) {
+        mX = (leftCorner.mX + rightCorner.mX) / 2;
+        mY = (leftCorner.mY + rightCorner.mY) / 2;
+        
+        // also average confidence
+        mConfidence = (leftCorner.mConfidence + rightCorner.mConfidence) / 2;
+    }
+
 	/*<constructor>*/	FFeatureLocation  (
 		) :
 		mX(0.0),
@@ -170,6 +179,24 @@ private:
         FFlocs[FFeatureLocation::FFMouthRightCorner] = FFeatureLocation(landmarks.part(54).x(), landmarks.part(54).y());
         FFlocs[FFeatureLocation::FFNoseLeftSide] = FFeatureLocation(landmarks.part(31).x(), landmarks.part(31).y());
         FFlocs[FFeatureLocation::FFNoseRightSide] = FFeatureLocation(landmarks.part(35).x(), landmarks.part(35).y());
+
+        // TODO: fill eyes and mouth centers; e.g., EyeCenter = (LeftCorner+RightCorner)/2
+        // left eye
+        FFlocs[FFeatureLocation::FFLeftEyeCenter].findLandmarkCenter(
+            FFlocs[FFeatureLocation::FFLeftEyeLeftCorner], 
+            FFlocs[FFeatureLocation::FFLeftEyeRightCorner]
+        );
+        // right eye
+        FFlocs[FFeatureLocation::FFRightEyeCenter].findLandmarkCenter(
+            FFlocs[FFeatureLocation::FFRightEyeLeftCorner], 
+            FFlocs[FFeatureLocation::FFRightEyeRightCorner]
+        );
+        // mouth
+        FFlocs[FFeatureLocation::FFMouthCenter].findLandmarkCenter(
+            FFlocs[FFeatureLocation::FFMouthLeftCorner], 
+            FFlocs[FFeatureLocation::FFMouthRightCorner]
+        );
+
     }
 };
 
