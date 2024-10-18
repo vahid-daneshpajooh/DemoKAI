@@ -1,5 +1,8 @@
 #include "KAITaskPipeline.h"
+#include "Logger.h"
+
 #include <algorithm>
+#include <chrono>
 
 // Add task to the pipeline
 void KAITaskPipeline::addTask(std::unique_ptr<KAITask> task) {
@@ -21,8 +24,20 @@ void KAITaskPipeline::runPipeline(Image& img) {
     // Sort the tasks before executing
     sortTasksByPriority();
 
+    // logging 
+    Logger& logger = Logger::getInstance();
+    logger.log(INFO, "Processing image: " + img.getName());
+
     // Execute each task in sequence, passing the bounding boxes
     for (auto& task : taskQueue) {
+        // logging - [task name]
+        logger.log(INFO, "Starting task: " + task->getName());
+        
+        auto startTime = std::chrono::high_resolution_clock::now();
+        // Run task
         task->run(img);
+        
+        // logging - [task inference time]
+        logger.logInferenceTime(task->getName(), startTime);
     }
 }

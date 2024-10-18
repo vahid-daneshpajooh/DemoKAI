@@ -8,6 +8,18 @@
 class Image {
 public:
     Image(const std::string& img_path){
+
+        // we use linux standard file separator "/"
+        size_t pos = img_path.find_last_of('/');
+        if(pos == std::string::npos){
+            // No directory separator found, return the entire path
+            imageName = img_path;
+        }
+        else {
+            // everything (inlcuding extension) after last '/'
+            imageName = img_path.substr(pos + 1);
+        }
+
         imgMat = cv::imread(img_path);
     }
 
@@ -56,7 +68,13 @@ public:
         overlayFaceFeaturesOnImage(outMat);
     }
 
+    std::string getName(){
+        return imageName;
+    }
+
 private:
+    
+    std::string imageName;
     cv::Mat imgMat;
 
     // Face Detection results

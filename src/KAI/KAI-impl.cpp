@@ -2,15 +2,23 @@
 #include <fstream>
 
 #include "argparser.h"
-//#include <nlohmann/json.hpp>
+#include "Logger.h"
 
 #include "Image.h"
+
 #include "KAITaskManager.h"
 
 // using json = nlohmann::json;
 
 int main(int argc, char** argv) {
     
+    // TODO: add logger as input options --log
+    // Initialize logger
+    // (can set to a file or keep it as console output)
+    Logger& logger = Logger::getInstance();
+    // Optional: log to a file
+    logger.setLogFile("pipeline_log.txt");
+
     int Failed = parseArguments(argc, argv);
     if (Failed) {
         return EXIT_FAILURE;
@@ -40,6 +48,11 @@ int main(int argc, char** argv) {
     if(!outMat.empty() && !output_path.empty())
         cv::imwrite(output_path, outMat);
 
-    std::cout << "[KAI Task Manager]-- Process completed successfully!" << std::endl;
+    std::string msg = "[KAI Task Manager]-- Process completed successfully!"
+                      "\n===================================================";
+
+    logger.log(INFO, msg);
+
+    std::cout << msg << std::endl;
     return EXIT_SUCCESS;
 }

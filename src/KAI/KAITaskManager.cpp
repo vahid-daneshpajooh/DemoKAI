@@ -44,6 +44,7 @@ void KAITaskManager::loadMLConfigs(const std::string config_path)
         }
 
         if(task){
+            task->setName(module.task);
             task->setPrecedence(module.precedence);
             kai_pipeline.addTask(std::move(task));
         }

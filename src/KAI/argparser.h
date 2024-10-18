@@ -3,6 +3,8 @@
 #include <nlohmann/json.hpp>
 #include <sys/stat.h>
 
+#include "Logger.h"
+
 using json = nlohmann::json;
 
 std::string outputPath;
@@ -27,8 +29,15 @@ bool isDirectory(const std::string& path) {
 
 int parseArguments(int argc, char** argv){
     
+    Logger& logger = Logger::getInstance();
+
     if (argc < 3) {
-        std::cerr << "[KAI Task Manager]-- Usage: " << argv[0] << " <image_path> <json_path>" << std::endl;
+        std::string msg = "[KAI Task Manager]-- Usage: " + std::string(argv[0]) + " <image_path> <json_path>";
+
+        // logging
+        logger.log(ERROR, msg);
+
+        std::cerr << msg << std::endl;        
         return EXIT_FAILURE;
     }
 
@@ -36,7 +45,12 @@ int parseArguments(int argc, char** argv){
     imagePath = argv[1];
 
     if (!fileExists(imagePath)) {
-        std::cerr << "[KAI Task Manager]-- Error: Could not open or find the image!" << std::endl;
+        std::string msg = "[KAI Task Manager]-- Error: Could not open or find the image!";
+
+        // logging
+        logger.log(ERROR, msg);
+
+        std::cerr << msg << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -45,7 +59,12 @@ int parseArguments(int argc, char** argv){
     jsonPath = argv[2];
 
     if (!fileExists(jsonPath)) {
-        std::cerr << "[KAI Task Manager]-- Error: Could not open the MLConfig JSON file!" << std::endl;
+        std::string msg = "[KAI Task Manager]-- Error: Could not open the MLConfig JSON file!";
+
+        // logging
+        logger.log(ERROR, msg);
+        
+        std::cerr << msg << std::endl;
         return EXIT_FAILURE;
     }
 

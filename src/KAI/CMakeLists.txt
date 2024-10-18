@@ -22,6 +22,9 @@ set(SOURCES
 	# KAI tasks
     FaceDetector.cpp
 	FacialFeatureDetector.cpp
+
+	# Utils
+	Logger.cpp
 )
 
 # Add header files
@@ -38,6 +41,7 @@ set(HEADERS
 	# KAI utils
 	MLConfigLoader.h 	# ML Config Loader
 	argparser.h 		# input argument parser
+	Logger.h
 	
 	Image.h				# Image class
 	FacialFeatures.h
