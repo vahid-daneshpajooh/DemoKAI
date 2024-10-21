@@ -43,6 +43,10 @@ public:
         vFacialFeatures = features;
     }
 
+    std::vector<FacialFeatures> getFacialFeatures(){
+        return vFacialFeatures;
+    }
+
     void getImage_faceOn(cv::Mat& outMat){
         if (imgMat.empty()){
             return;
@@ -120,11 +124,11 @@ private:
         
         // get FacialFeatures class for each face detected in image
         for(const auto& faceFeatures: vFacialFeatures){
-            // get facial landmarks (e.g., eye, lip, nose corners)
-            auto landmarks = faceFeatures.getFacialFeatures();
+            // get facial features (e.g., Dlib 68 points)
+            auto featurePoints = faceFeatures.getFacialFeatures();
 
-            // draw a circle to show each landmark on the face
-            for (const auto& point: landmarks){
+            // draw a circle to show each feature point on the face
+            for (const auto& point: featurePoints){
                 // cv::Scalar(255, 45, 45) -> blue
                 cv::circle(overlayImg, point, 1, cv::Scalar(255, 45, 45), 1);
             }

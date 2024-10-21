@@ -18,35 +18,6 @@ public:
     void init(const std::map<std::string, Type> params);
 
     void run(Image& img) override;
-    
-    void detectFaces(Image& image);
-
-    void setInputName(const std::string name){
-        inputName = name;
-    }
-
-    void setOutputName(const std::string name){
-        outputName = name;
-    }
-
-    // set model input size
-    void setInputSize(const int width, const int height){
-        if (width > 0 && height > 0)
-            net_inputSize = cv::Size(width, height);
-    }
-
-    void setConfidenceLevel(const float thresh){
-        if(thresh > 0 && thresh <= 1)
-            conf_thresh = thresh;
-    }
-
-    void setMeanSubtraction(const std::vector<float> mean){
-        imgMean = cv::Scalar(mean[0], mean[1], mean[2]);
-    }
-
-    void setScaleFactor(const float scale){
-        scaleFactor = scale;
-    }
 
 private:
 
@@ -66,7 +37,7 @@ private:
     // normalize image
     // x_n = (x - mean) / sigma
     cv::Scalar imgMean = (104.0, 177.0, 123.0);
-; // mean subtract
+    // mean subtract
     float scaleFactor = 1.0; // sigma scale
 
     // cv::dnn::blobFromImage flags

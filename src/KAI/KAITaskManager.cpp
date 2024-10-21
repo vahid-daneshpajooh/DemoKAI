@@ -1,6 +1,7 @@
 #include "KAITaskManager.h"
 #include "FaceDetector.h"
 #include "FacialFeatureDetector.h"
+#include "FacePoseEstimator.h"
 
 #include <iostream>
 #include <fstream>
@@ -41,6 +42,21 @@ void KAITaskManager::loadMLConfigs(const std::string config_path)
             std::string modelPath = module.modelName;
             // pass model to constructor
             task = std::make_unique<FacialFeatureDetector>(modelPath);
+        }
+        else if(str_task == "FacePose"){
+            // read model and cfg files (*.pb and *.csv)
+            std::string modelPath = module.modelName;
+            std::string cfgPath = module.cfg;
+            
+            // pass model to constructor
+            FacePoseEstimator* pFacePoseEstimator = new FacePoseEstimator(modelPath, cfgPath);
+
+            // read other task specific params and initialize model
+            auto params = module.params;
+            pFacePoseEstimator->init(params);
+
+            task = std::unique_ptr<KAITask>(pFacePoseEstimator);
+
         }
 
         if(task){
