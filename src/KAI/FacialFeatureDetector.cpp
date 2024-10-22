@@ -43,7 +43,9 @@ void FacialFeatureDetector::run(Image& image) {
 
         // extract main facial landmarks (e.g., eye, nose, lips corners)
         FacialFeatures features;
+        features.setFaceBbox(std::make_pair(faceBox, conf));
         features.setFFeaturesFromDlib(landmarks);
+
         vFeatures.push_back(features);
     }
     // Keep Facial Features with image

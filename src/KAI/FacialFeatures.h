@@ -144,6 +144,25 @@ public:
         setFacialLandmarksFromDlib(landmarks);
     }
 
+    void setFaceBbox(const std::pair<cv::Rect, float>& bbox){
+        faceBbox = bbox;
+    }
+    
+    cv::Rect getFaceBbox() const {
+        return faceBbox.first;
+    }
+
+    void setFacePose(const std::vector<float>& facePose){
+        
+        RollYawPitch.clear();
+        // TODO: assert size is 3 and values in [0, 360)
+        RollYawPitch = facePose;
+    }
+
+    std::vector<float> getFacePose() const {
+        return RollYawPitch;
+    }
+
     // Methods to handle additional features (e.g., smile detection, eye state)
     void setSmileDetected(bool smile);
     bool isSmileDetected() const;
@@ -158,12 +177,20 @@ private:
     // Other possible facial features
     bool smileDetected;
 
+    // face bounding box and confidence score
+    std::pair<cv::Rect, float> faceBbox;
+
     // facial feature points
     // e.g., 68 for Dlib model
     std::vector<cv::Point> vFFpoints;
 
     // Facial landmarks (eyes, nose, mouth)
     std::vector<FFeatureLocation> FFlocs;
+
+    // Face Pose (Roll, Yaw, and Pitch)
+    // param range: [0, 360) degrees
+    // 360 is invalid value
+    std::vector<float> RollYawPitch = {360.0f, 360.0f, 360.0f};
 
     ///
     // helper functions
@@ -196,8 +223,6 @@ private:
             FFlocs[FFeatureLocation::FFMouthLeftCorner], 
             FFlocs[FFeatureLocation::FFMouthRightCorner]
         );
-
     }
 };
-
 #endif // FACIALFEATURES_H

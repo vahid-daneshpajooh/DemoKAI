@@ -113,14 +113,22 @@ void FacePoseEstimator::run(Image &img)
             facePoseNet_.setInput(matDists, mInputName);
             cv::Mat poseMat = facePoseNet_.forward();
 
+            // TODO: add face pose to FacialFeature class
             RollYawPitch[0] = poseMat.at<float>(0,2);
             RollYawPitch[1] = poseMat.at<float>(0,1);
             RollYawPitch[2] = poseMat.at<float>(0,0);
         }
         catch (cv::Exception& e) {
+            // TODO: handle error
+            // (right now, we print error and continue)
             std::cerr << e.what() << std::endl;
-        }   
+        }
+
+        faceFeature.setFacePose(RollYawPitch);
     }
+
+    // TODO: Image class should modify its facial features in-place (instead of clear and copy)
+    img.setFacialFeatures(vFFeatures);
 }
 
 std::vector<float> 
@@ -148,17 +156,22 @@ FacePoseEstimator::computeDistFeaturePairs(std::vector<cv::Point> features){
         float xDist, yDist;
 		for ( int j = i + 1; j < 68; j++ )
 		{
+            float std = stdNormalize[iFeature];
+            // avoid divide by zero
+            if (std == 0.0)
+                std = 1;
+
             // (feature_i, feature_j).x dist
 			xDist = static_cast<float>(
                                 ( iod_scale * (features[i].x - features[j].x) - meanSubtract[iFeature])
-                                / stdNormalize[iFeature]);
+                                / std);
 			distFPairs.push_back(xDist);
             
             iFeature++;
             // (feature_i, feature_j).y dist
 			yDist = static_cast<float>(
                                 ( iod_scale * (features[i].y - features[j].y) - meanSubtract[iFeature])
-                                / stdNormalize[iFeature]);
+                                / std);
 			distFPairs.push_back(yDist);
             
             iFeature++;

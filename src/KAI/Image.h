@@ -70,6 +70,9 @@ public:
         
         overlayFaceLandmarkOnImage(outMat);
         overlayFaceFeaturesOnImage(outMat);
+
+        // Print estimated roll, yaw, and pitch degrees
+        overlayFacePoseOnImage(outMat);
     }
 
     std::string getName(){
@@ -95,11 +98,12 @@ private:
 
     // Draw rectangle around detected faces
     void overlayFaceOnImage(cv::Mat& overlayImg){
-        for(const auto& faceBox: faceBboxes){
-            cv::rectangle(overlayImg, faceBox.first, cv::Scalar(45, 255, 45), 2, 4);
-            cv::putText(overlayImg, std::to_string(static_cast<int>(faceBox.second*100)),
-                        cv::Point(faceBox.first.x+2, faceBox.first.y-5),
-                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 45, 45), 2);
+        for(const auto& faceBbox: faceBboxes){
+            cv::rectangle(overlayImg, faceBbox.first, cv::Scalar(45, 255, 45), 2, 4);
+            
+            cv::Point topRight(faceBbox.first.x + faceBbox.first.width - 25, faceBbox.first.y-5);
+            cv::putText(overlayImg, std::to_string(static_cast<int>(faceBbox.second*100)),
+                        topRight, cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 45, 45), 2);
         }
     }
 
@@ -132,6 +136,22 @@ private:
                 // cv::Scalar(255, 45, 45) -> blue
                 cv::circle(overlayImg, point, 1, cv::Scalar(255, 45, 45), 1);
             }
+        }
+    }
+
+    void overlayFacePoseOnImage(cv::Mat overlayImg){
+
+        // get FacialFeatures class for each face detected in image
+        for(const auto& faceFeatures: vFacialFeatures) {
+            // get face pose vector
+            auto facePose = faceFeatures.getFacePose();
+            std::string text = "Roll:" + std::to_string(static_cast<int>(facePose[0])) + 
+                              ", Yaw:" + std::to_string(static_cast<int>(facePose[1])) + 
+                              ", Pitch:" + std::to_string(static_cast<int>(facePose[2]));
+
+            auto faceBox = faceFeatures.getFaceBbox(); // only outputs bbox (no conf)
+            cv::putText(overlayImg, text, cv::Point(faceBox.x+2, faceBox.y-5),
+                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 45, 45), 1);
         }
     }
 };
