@@ -113,10 +113,101 @@ Dlib facial landmarks
 	}
 };
 
+// Base class for auxiliary data
+struct AuxData {
+
+////////////////////////////////
+// Auxiliary Data
+// 1. Head Pose
+// 2. EyesOpen
+// 3. Gaze
+// 4. MouthOpen
+// 5. Smile
+// 6. RedEye
+///////////////////////////////
+
+    // The main function of FacialFeatures class is to find facial feature points
+    // (eyes, nose, mouth, etc.) given a face box. However, there are auxiiary facial data
+    // that can be computed and returned at the same time, often using the same data
+    // (e.g., input image, facial feature points) already provided by the client.
+
+	enum eAuxDataID		// enum identifying the auxiliary data type
+	{
+		 eHeadPose	= 0
+		,eEyesOpen
+		,eGaze
+		,eMouthOpen
+		,eSmile
+		,eRedEye
+		,eNAuxDataID
+	};
+
+    virtual ~AuxData() {}
+};
+
+// 1. HeadPose derived from AuxData
+struct HeadPose : public AuxData {
+    float roll;
+    float yaw;
+    float pitch;
+
+    HeadPose() : roll(360.0f), yaw(360.0f), pitch(360.0f) {}
+};
+
+// 2. EyesOpen derived from AuxData
+struct EyesOpen : public AuxData {
+    float leftEyeScore;
+    float rightEyeScore;
+
+    EyesOpen() : leftEyeScore(-1.0f), rightEyeScore(-1.0f) {}
+};
+
+// 3. Gaze derived from AuxData
+struct Gaze : public AuxData {
+    float leftEyeYaw;
+    float leftEyePitch;
+    std::vector<float> leftIrisXYR;
+
+    float rightEyeYaw;
+    float rightEyePitch;
+    std::vector<float> rightIrisXYR;
+
+    Gaze()
+        : leftEyeYaw(360.0f), leftEyePitch(360.0f), leftIrisXYR(3, 0.0f),
+            rightEyeYaw(0.0f), rightEyePitch(0.0f), rightIrisXYR(3, 0.0f) {}
+};
+
+// 4. MouthOpen derived from AuxData
+struct MouthOpen : public AuxData {
+    float openScore;
+    float mouthOpenRatio;
+
+    MouthOpen() : openScore(-1.0f), mouthOpenRatio(-1.0f) {}
+};
+
+// 5. Smile derived from AuxData
+struct Smile : public AuxData {
+    float smileScore;
+
+    Smile() : smileScore(-1.0f) {}
+};
+
+// 6. RedEye derived from AuxData
+struct RedEye : public AuxData {
+    float leftRedEyeScore;
+    float leftEyeFractionRedPixels;
+
+    float rightRedEyeScore;
+    float rightEyeFractionRedPixels;
+
+    RedEye() : leftRedEyeScore(-1.0f), leftEyeFractionRedPixels(-1.0f),
+               rightRedEyeScore(-1.0f), rightEyeFractionRedPixels(-1.0f) {}
+};
+
 class FacialFeatures {
 public:
     // Constructor
-    FacialFeatures() : smileDetected(false) {
+    FacialFeatures() {
         // Initialize all feature locations to default
         for (int i = 0; i < FFeatureLocation::FFNCommonFeatures; ++i) {
             FFlocs.push_back(FFeatureLocation());
@@ -207,7 +298,11 @@ private:
         FFlocs[FFeatureLocation::FFNoseLeftSide] = FFeatureLocation(landmarks.part(31).x(), landmarks.part(31).y());
         FFlocs[FFeatureLocation::FFNoseRightSide] = FFeatureLocation(landmarks.part(35).x(), landmarks.part(35).y());
 
-        // TODO: fill eyes and mouth centers; e.g., EyeCenter = (LeftCorner+RightCorner)/2
+        // TODO: fill eyes and mouth centers;
+        // e.g., EyeCenter = (LeftCorner+RightCorner)/2
+        // or more accurate LeftEyeCenter  = average(37, 38, 40, 41) (?)
+        //                  RightEyeCenter = average(43, 44, 46, 47) (?)
+        //                  MouthCenter    = average(60, ..., 67)    (?)
         // left eye
         FFlocs[FFeatureLocation::FFLeftEyeCenter].findLandmarkCenter(
             FFlocs[FFeatureLocation::FFLeftEyeLeftCorner], 
