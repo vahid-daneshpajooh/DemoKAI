@@ -31,7 +31,7 @@ private:
 
     bool swapRB = false;
     bool crop = false;
-
+    
     ///
     // helper functions
     ///

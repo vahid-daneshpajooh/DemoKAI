@@ -66,9 +66,13 @@ void MouthOpenDetector::run(Image &img)
     int imgWidth = imgMat.cols;
     int imgHeight = imgMat.rows;
 
+    // TODO: update facial features class on Image
+    auto vFFeatures = img.getFacialFeatures();
+    
     // Loop through detected face bounding boxes
-    std::vector<FacialFeatures> vFeatures;
-    for (const auto& [faceBox, conf] : img.getImage_faceBboxes()) {
+    for (auto& fFeatures : vFFeatures) {
+
+        auto faceBox = fFeatures.getFaceBbox();
 
         // crop face bbox and resize to model's input size
         cv::Mat faceMat = imgMat(faceBox);
@@ -80,5 +84,14 @@ void MouthOpenDetector::run(Image &img)
         mouthOpenNet_.setInput(blob, inputName);
         // output: prob. of mouth open
         float probMouthOpen = mouthOpenNet_.forward().at<float>(0,0);
+
+        auto pMouthOpen = std::make_shared<MouthOpen>();
+        pMouthOpen->openScore = probMouthOpen;
+
+        // Update Aux Data in Facial Features class
+        fFeatures.setAuxData<MouthOpen>(pMouthOpen);
     }
+
+    // TODO: Image class should modify its facial features in-place (instead of clear and copy)
+    img.setFacialFeatures(vFFeatures);
 }

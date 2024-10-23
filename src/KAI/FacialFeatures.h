@@ -5,6 +5,8 @@
 #include <opencv2/core/types.hpp>
 
 #include <string>
+#include <vector>
+#include <memory>
 
 struct FFeatureLocation
 {
@@ -133,7 +135,10 @@ struct AuxData {
 		,eNAuxDataID
 	};
 
+    eAuxDataID auxID;
+    
     virtual ~AuxData() {}
+    AuxData(eAuxDataID id): auxID(id) {}
 };
 
 // 1. HeadPose derived from AuxData
@@ -142,7 +147,7 @@ struct HeadPose : public AuxData {
     float yaw;
     float pitch;
 
-    HeadPose() : roll(360.0f), yaw(360.0f), pitch(360.0f) {}
+    HeadPose() : AuxData(eHeadPose), roll(360.0f), yaw(360.0f), pitch(360.0f) {}
 };
 
 // 2. EyesOpen derived from AuxData
@@ -150,7 +155,7 @@ struct EyesOpen : public AuxData {
     float leftEyeScore;
     float rightEyeScore;
 
-    EyesOpen() : leftEyeScore(-1.0f), rightEyeScore(-1.0f) {}
+    EyesOpen() : AuxData(eEyesOpen), leftEyeScore(-1.0f), rightEyeScore(-1.0f) {}
 };
 
 // 3. Gaze derived from AuxData
@@ -164,7 +169,7 @@ struct Gaze : public AuxData {
     std::vector<float> rightIrisXYR;
 
     Gaze()
-        : leftEyeYaw(360.0f), leftEyePitch(360.0f), leftIrisXYR(3, 0.0f),
+        : AuxData(eGaze), leftEyeYaw(360.0f), leftEyePitch(360.0f), leftIrisXYR(3, 0.0f),
             rightEyeYaw(0.0f), rightEyePitch(0.0f), rightIrisXYR(3, 0.0f) {}
 };
 
@@ -173,14 +178,14 @@ struct MouthOpen : public AuxData {
     float openScore;
     float mouthOpenRatio;
 
-    MouthOpen() : openScore(-1.0f), mouthOpenRatio(-1.0f) {}
+    MouthOpen() : AuxData(eMouthOpen), openScore(-1.0f), mouthOpenRatio(-1.0f) {}
 };
 
 // 5. Smile derived from AuxData
 struct Smile : public AuxData {
     float smileScore;
 
-    Smile() : smileScore(-1.0f) {}
+    Smile() : AuxData(eSmile), smileScore(-1.0f) {}
 };
 
 // 6. RedEye derived from AuxData
@@ -191,7 +196,7 @@ struct RedEye : public AuxData {
     float rightRedEyeScore;
     float rightEyeFractionRedPixels;
 
-    RedEye() : leftRedEyeScore(-1.0f), leftEyeFractionRedPixels(-1.0f),
+    RedEye() : AuxData(eRedEye), leftRedEyeScore(-1.0f), leftEyeFractionRedPixels(-1.0f),
                rightRedEyeScore(-1.0f), rightEyeFractionRedPixels(-1.0f) {}
 };
 
@@ -203,6 +208,9 @@ public:
         for (int i = 0; i < FFeatureLocation::FFNCommonFeatures; ++i) {
             FFlocs.push_back(FFeatureLocation());
         }
+
+        // Initialize all auxiliary data 
+        vAuxData.resize(AuxData::eNAuxDataID);
     }
 
     // landmarks, including (eye, mouth, nose) left/right corners and center
@@ -245,6 +253,12 @@ public:
         return RollYawPitch;
     }
 
+    // Methods to add auxiliary data
+    template<typename T>
+    void setAuxData(std::shared_ptr<T> auxData) {
+        vAuxData[auxData->auxID] = auxData;
+    }
+
     // Methods to handle additional features (e.g., smile detection, eye state)
     void setSmileDetected(bool smile);
     bool isSmileDetected() const;
@@ -256,9 +270,6 @@ public:
     std::string getFeatureSummary() const;
 
 private:
-    // Other possible facial features
-    bool smileDetected;
-
     // face bounding box and confidence score
     std::pair<cv::Rect, float> faceBbox;
 
@@ -269,10 +280,18 @@ private:
     // Facial landmarks (eyes, nose, mouth)
     std::vector<FFeatureLocation> FFlocs;
 
-    // Face Pose (Roll, Yaw, and Pitch)
+    // Auxiliary facial features
+    
+    // vector to store all auxiliary data
+    std::vector<std::shared_ptr<AuxData>> vAuxData;
+
+    // 1. Head Pose (Roll, Yaw, and Pitch)
     // param range: [0, 360) degrees
-    // 360 is invalid value
+    // (360 is invalid value)
     std::vector<float> RollYawPitch = {360.0f, 360.0f, 360.0f};
+
+    // 4. Mouth Open
+    bool smileDetected;
 
     ///
     // helper functions
