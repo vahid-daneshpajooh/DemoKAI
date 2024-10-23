@@ -2,6 +2,8 @@
 #define IMAGE_H
 
 #include <vector>
+#include <mutex>
+
 #include <opencv2/opencv.hpp>
 #include "FacialFeatures.h"
 
@@ -24,26 +26,41 @@ public:
     }
 
     void getImage_Mat(cv::Mat& outMat){
+        
+        std::lock_guard<std::mutex> lock(imageMutex); // protect access
+        
         imgMat.copyTo(outMat);
     }
 
     std::vector<std::pair<cv::Rect, float>> getImage_faceBboxes(){
+        
+        std::lock_guard<std::mutex> lock(imageMutex); // protect access
+        
         return faceBboxes;
     }
 
     void setImage_faceBboxes(const std::vector<std::pair<cv::Rect, float>>& bboxes){
+        
+        std::lock_guard<std::mutex> lock(imageMutex); // protect access
+
         // clear current vector elements
         faceBboxes.clear();
         faceBboxes = bboxes;
     }
 
     void setFacialFeatures(std::vector<FacialFeatures> features){
+        
+        std::lock_guard<std::mutex> lock(imageMutex); // protect access
+
         // clear current vector elements
         vFacialFeatures.clear();
         vFacialFeatures = features;
     }
 
     std::vector<FacialFeatures> getFacialFeatures(){
+        
+        std::lock_guard<std::mutex> lock(imageMutex); // protect access
+        
         return vFacialFeatures;
     }
 
@@ -81,8 +98,11 @@ public:
 
 private:
     
-    std::string imageName;
-    cv::Mat imgMat;
+    // Mutex to protect shared image data
+    std::mutex imageMutex;
+
+    std::string imageName; // image file name
+    cv::Mat imgMat;        // image cv::Mat variable
 
     // Face Detection results
     // bounding boxes (x, y, width, height) and confidence scores
