@@ -14,10 +14,6 @@ public:
     FacePoseEstimator(const std::string& modelPath, const std::string& configPath,
                 short backendId = 0, short targetId = 0);
     
-    // TODO: create a class for Face Pose detection
-    // what is the output of .pb model's face pose?
-    // how to read the model (cv::dnn::readFromTensorflow?)
-    
     void init(const std::map<std::string, Type> params);
 
     void run(Image& img) override;

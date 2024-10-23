@@ -34,8 +34,10 @@ void KAITaskPipeline::runPipeline(Image& img) {
         logger.log(INFO, "Starting task: " + task->getName());
         
         auto startTime = std::chrono::high_resolution_clock::now();
+        
         // Run task
-        task->run(img);
+        // TODO: handle errors at top-level (?)
+        task->run(img);       
         
         // logging - [task inference time]
         logger.logInferenceTime(task->getName(), startTime);
