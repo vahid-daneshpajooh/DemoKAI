@@ -242,21 +242,37 @@ public:
         return faceBbox.first;
     }
 
+    /*
+    // WE SET Face Pose as an AuxData now
     void setFacePose(const std::vector<float>& facePose){
         
         RollYawPitch.clear();
         // TODO: assert size is 3 and values in [0, 360)
         RollYawPitch = facePose;
     }
+    */
 
     std::vector<float> getFacePose() const {
+        
+        auto pHeadPose = getAuxData<HeadPose>(AuxData::eHeadPose);
+        
+        std::vector<float> RollYawPitch = {360.0f, 360.0f, 360.0f};
+        RollYawPitch[0] = pHeadPose->roll;
+        RollYawPitch[1] = pHeadPose->yaw;
+        RollYawPitch[2] = pHeadPose->pitch;
+
         return RollYawPitch;
     }
 
-    // Methods to add auxiliary data
+    // Methods to add or retrieve auxiliary data
     template<typename T>
     void setAuxData(std::shared_ptr<T> auxData) {
         vAuxData[auxData->auxID] = auxData;
+    }
+
+    template<typename T>
+    std::shared_ptr<T> getAuxData(AuxData::eAuxDataID auxID) const {
+        return std::dynamic_pointer_cast<T>(vAuxData[auxID]);
     }
 
     // Methods to handle additional features (e.g., smile detection, eye state)
@@ -288,7 +304,6 @@ private:
     // 1. Head Pose (Roll, Yaw, and Pitch)
     // param range: [0, 360) degrees
     // (360 is invalid value)
-    std::vector<float> RollYawPitch = {360.0f, 360.0f, 360.0f};
 
     // 4. Mouth Open
     bool smileDetected;

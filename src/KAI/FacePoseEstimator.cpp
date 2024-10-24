@@ -108,23 +108,24 @@ void FacePoseEstimator::run(Image &img)
         cv::Mat matDists(1, nMLFeatures, cv::DataType<float>::type);
         std::memcpy(matDists.data, distFpairs.data(), distFpairs.size() * sizeof(float) );
 
-        std::vector<float> RollYawPitch = {360.0f, 360.0f, 360.0f};
         try {
             facePoseNet_.setInput(matDists, mInputName);
             cv::Mat poseMat = facePoseNet_.forward();
 
-            // TODO: add face pose to FacialFeature class
-            RollYawPitch[0] = poseMat.at<float>(0,2);
-            RollYawPitch[1] = poseMat.at<float>(0,1);
-            RollYawPitch[2] = poseMat.at<float>(0,0);
+            // TODO: add face pose as HeadPose struct (AuxData) to FacialFeature class
+            auto pHeadPose = std::make_shared<HeadPose>();
+            pHeadPose->roll = poseMat.at<float>(0,2);
+            pHeadPose->yaw = poseMat.at<float>(0,1);
+            pHeadPose->pitch = poseMat.at<float>(0,0);
+
+            // Update Aux Data in Facial Features class
+            faceFeature.setAuxData<HeadPose>(pHeadPose);            
         }
         catch (cv::Exception& e) {
             // TODO: handle error
             // (right now, we print error and continue)
             std::cerr << e.what() << std::endl;
         }
-
-        faceFeature.setFacePose(RollYawPitch);
     }
 
     // TODO: Image class should modify its facial features in-place (instead of clear and copy)
