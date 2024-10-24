@@ -132,6 +132,7 @@ struct AuxData {
 		,eMouthOpen
 		,eSmile
 		,eRedEye
+        ,eEyeglasses
 		,eNAuxDataID
 	};
 
@@ -198,6 +199,13 @@ struct RedEye : public AuxData {
 
     RedEye() : AuxData(eRedEye), leftRedEyeScore(-1.0f), leftEyeFractionRedPixels(-1.0f),
                rightRedEyeScore(-1.0f), rightEyeFractionRedPixels(-1.0f) {}
+};
+
+// 7. Eyeglasses derived from AuxData
+struct Eyeglasses : public AuxData {
+    float eyeglassesScore;
+
+    Eyeglasses() : AuxData(eEyeglasses), eyeglassesScore(-1.0f) {}
 };
 
 class FacialFeatures {
