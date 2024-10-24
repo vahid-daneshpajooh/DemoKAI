@@ -172,6 +172,14 @@ private:
             auto faceBox = faceFeatures.getFaceBbox(); // only outputs bbox (no conf)
             cv::putText(overlayImg, text, cv::Point(faceBox.x+2, faceBox.y-5),
                         cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 45, 45), 1);
+
+            // print mouth open prob. for now
+            float mouthOpenScore = faceFeatures.isMouthOpen();
+            std::cout << "Mouth Open Score = " << mouthOpenScore << std::endl;
+
+            // print smile prob. for now
+            float smileScore = faceFeatures.isSmileDetected();
+            std::cout << "Smile Score = " << smileScore << std::endl;
         }
     }
 };

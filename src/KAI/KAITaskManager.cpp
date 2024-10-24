@@ -3,6 +3,7 @@
 #include "FacialFeatureDetector.h"
 #include "FacePoseEstimator.h"
 #include "MouthOpenDetector.h"
+#include "SmileDetector.h"
 
 #include <iostream>
 #include <fstream>
@@ -70,6 +71,19 @@ void KAITaskManager::loadMLConfigs(const std::string config_path)
             pMouthOpenDetector->init(params);
 
             task = std::unique_ptr<KAITask>(pMouthOpenDetector);
+        }
+        else if (str_task == "Smile"){
+            // read model filename (*.pb)
+            std::string modelPath = module.modelName;
+
+            // pass model to constructor
+            SmileDetector* pSmileDetector = new SmileDetector(modelPath);
+
+            // read other task specific params and initialize model
+            auto params = module.params;
+            pSmileDetector->init(params);
+
+            task = std::unique_ptr<KAITask>(pSmileDetector);
         }
 
         if(task){

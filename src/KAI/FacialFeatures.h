@@ -203,7 +203,7 @@ struct RedEye : public AuxData {
 class FacialFeatures {
 public:
     // Constructor
-    FacialFeatures() {
+    FacialFeatures(): smileDetected(false), mouthOpen(false){
         // Initialize all feature locations to default
         for (int i = 0; i < FFeatureLocation::FFNCommonFeatures; ++i) {
             FFlocs.push_back(FFeatureLocation());
@@ -243,7 +243,7 @@ public:
     }
 
     /*
-    // WE SET Face Pose as an AuxData now
+    // We set Face Pose as an AuxData now
     void setFacePose(const std::vector<float>& facePose){
         
         RollYawPitch.clear();
@@ -264,6 +264,18 @@ public:
         return RollYawPitch;
     }
 
+    float isMouthOpen() const {
+        auto pMouthOpen = getAuxData<MouthOpen>(AuxData::eMouthOpen);
+
+        return pMouthOpen->openScore;
+    }
+
+    float isSmileDetected() const {
+        auto pSmile = getAuxData<Smile>(AuxData::eSmile);
+
+        return pSmile->smileScore;
+    }
+
     // Methods to add or retrieve auxiliary data
     template<typename T>
     void setAuxData(std::shared_ptr<T> auxData) {
@@ -276,8 +288,8 @@ public:
     }
 
     // Methods to handle additional features (e.g., smile detection, eye state)
-    void setSmileDetected(bool smile);
-    bool isSmileDetected() const;
+    // void setSmileDetected(bool smile);
+    // bool isSmileDetected() const;
 
     // Method to clear all stored features (for reprocessing)
     void clearFeatures();
@@ -306,6 +318,9 @@ private:
     // (360 is invalid value)
 
     // 4. Mouth Open
+    bool mouthOpen;
+
+    // 5. Smile Detected
     bool smileDetected;
 
     ///
