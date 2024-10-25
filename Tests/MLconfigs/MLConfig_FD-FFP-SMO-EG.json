@@ -1,0 +1,93 @@
+{
+    "vMLConfigIDs": [
+        "FDDefault",
+		"FFDefault",
+		"FPDefault",
+		"MODefault",
+		"SMDefault",
+		"EDDefault"
+    ],
+    "vMLModules": [
+        {
+            "id": "FDDefault",
+            "task": "FaceDetection",
+            "version": 100,
+            "modelName": "/mnt/c/anselInstallDir/FacialImaging/FaceDetection/OpenCVDNN/res10_300x300_ssd_iter_140000_fp16.caffemodel",
+			"cfg": "/mnt/c/anselInstallDir/FacialImaging/FaceDetection/OpenCVDNN/deploy.prototxt",
+			"precedence": 1,
+            "vParams": {
+				"ConfidenceLevel": [0.6, "float"],
+                "ConfidenceLevel2": [-1.0, "float"],
+                "IODMinFraction": [0.0, "float"],
+                "NNInputImageHeight": [300, "int"],
+                "NNInputImageWidth": [300, "int"],
+                "NNInputName": ["data", "string"],
+                "NNMeanSubtraction": ["[ 104.0, 177.0, 123.0 ]", "vector<float>"],
+                "NNOutputName": ["detection_out", "string"]
+			}
+        },
+        {
+            "id": "FFDefault",
+            "task": "FacialFeatures",
+            "version": 100,
+            "modelName": "/mnt/c/anselInstallDir/FacialImaging/FacialFeature/dlib/shape_predictor_68_face_landmarks.dat",
+			"cfg": "",
+			"precedence": 2,
+            "vParams": {}
+		},
+		{
+            "id": "FPDefault",
+            "task": "FacePose",
+            "version": 200,
+            "modelName": "/mnt/c/anselInstallDir/FacialImaging/FacialFeature/OpenCVDNN/FacePoseModel2.pb",
+			"cfg": "/mnt/c/anselInstallDir/FacialImaging/FacialFeature/OpenCVDNN/FacePoseModel2MSD.csv",
+            "precedence": 5,
+			"vParams": {
+				"NNInputName": ["x", "string"],
+				"NNOutputName": ["dense_3/MatMul", "string"]
+				}
+        },
+		{
+            "id": "MODefault",
+            "task": "MouthOpen",
+            "version": 200,
+            "modelName": "/mnt/c/anselInstallDir/FacialImaging/FacialFeature/OpenCVDNN/MouthOpenModel2.pb",
+			"cfg": "",
+            "precedence": 10,
+			"vParams": {
+				"NNInputImageHeight": [224, "int"],
+                "NNInputImageWidth":  [224, "int"],
+				"NNImageNormalization": [0.00392156862745098, "float"],
+				"NNInputName": ["conv2d_input", "string"]
+				}
+        },
+		{
+            "id": "SMDefault",
+            "task": "Smile",
+            "version": 200,
+            "modelName": "/mnt/c/anselInstallDir/FacialImaging/FacialFeature/OpenCVDNN/SmileModel2.pb",
+			"cfg": "",
+            "precedence": 15,
+			"vParams": {
+				"NNInputImageHeight": [224, "int"],
+                "NNInputImageWidth":  [224, "int"],
+				"NNImageNormalization": [0.00392156862745098, "float"],
+				"NNInputName": ["input_2", "string"]
+				}
+        },
+		{
+            "id": "EDDefault",
+            "task": "Eyeglasses",
+            "version":100,
+            "modelName": "/mnt/c/anselInstallDir/FacialImaging/EyeglassesDetection/EyeglassesDetectionNNModel_v1.pb",
+			"cfg": "",
+            "precedence": 20,
+			"vParams": {
+				"NNInputImageHeight": [160, "int"],
+                "NNInputImageWidth":  [160, "int"],
+				"NNInputName": ["input", "string"],
+				"NNOutputName": ["cross_", "string"]
+				}
+        }
+    ]
+}

@@ -180,6 +180,10 @@ private:
             // print smile prob. for now
             float smileScore = faceFeatures.isSmileDetected();
             std::cout << "Smile Score = " << smileScore << std::endl;
+
+            // print eyeglasses prob. for now
+            float eyeglassesScore = faceFeatures.isEyeglassesDetected();
+            std::cout << "Eyeglasses Score = " << eyeglassesScore << std::endl;
         }
     }
 };

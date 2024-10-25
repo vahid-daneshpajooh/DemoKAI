@@ -26,6 +26,7 @@ set(SOURCES
 	FacePoseEstimator.cpp
 	MouthOpenDetector.cpp
 	SmileDetector.cpp
+	EyeglassesDetector.cpp
 
 	# Utils
 	Logger.cpp
@@ -45,7 +46,7 @@ set(HEADERS
 	FacePoseEstimator.h
 	MouthOpenDetector.h
 	SmileDetector.h
-
+	EyeglassesDetector.h
 
 	# KAI utils
 	MLConfigLoader.h 	# ML Config Loader

@@ -284,6 +284,12 @@ public:
         return pSmile->smileScore;
     }
 
+    float isEyeglassesDetected() const {
+        auto pEyeglasses = getAuxData<Eyeglasses>(AuxData::eEyeglasses);
+
+        return pEyeglasses->eyeglassesScore;
+    }
+
     // Methods to add or retrieve auxiliary data
     template<typename T>
     void setAuxData(std::shared_ptr<T> auxData) {
