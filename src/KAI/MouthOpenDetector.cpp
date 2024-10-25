@@ -77,7 +77,7 @@ void MouthOpenDetector::run(Image &img)
         // crop face bbox and resize to model's input size
         cv::Mat faceMat = imgMat(faceBox);
         cv::resize(faceMat, faceMat, net_inputSize);
-
+        
         cv::Mat blob = cv::dnn::blobFromImage(faceMat, scaleFactor, net_inputSize,
                                               cv::Scalar(0, 0, 0), swapRB, crop);
         
@@ -87,6 +87,17 @@ void MouthOpenDetector::run(Image &img)
 
         auto pMouthOpen = std::make_shared<MouthOpen>();
         pMouthOpen->openScore = probMouthOpen;
+
+        // TODO: compute mouth open ratio
+        // method 1: parted lips relative to corner-to-corner
+        // e.g., in Dlib 68 landmarks: dist(66,62) / dist(54, 48)
+        auto vFFDlib = fFeatures.getFacialFeatures();
+
+        float partedLips = cv::norm(vFFDlib[66] - vFFDlib[62]);
+        float corner2corner = cv::norm(vFFDlib[54] - vFFDlib[48]);
+        float mouthOpenRatio = partedLips / corner2corner;
+
+        pMouthOpen->mouthOpenRatio = mouthOpenRatio;
 
         // Update Aux Data in Facial Features class
         fFeatures.setAuxData<MouthOpen>(pMouthOpen);
