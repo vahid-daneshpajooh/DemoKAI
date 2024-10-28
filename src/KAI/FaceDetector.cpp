@@ -69,11 +69,8 @@ void FaceDetector::init(const std::map<std::string, Type> params)
 
 void FaceDetector::run(Image &img)
 {
-    cv::Mat imgMat;
-    img.getImage_Mat(imgMat);
-    
     // original image width and height
-    auto img_shape = imgMat.size();
+    auto imgSize = img.getImageSize();
 
     // resize image to fit model's input size
     cv::Mat img_resized;
@@ -88,13 +85,13 @@ void FaceDetector::run(Image &img)
 
     // post-process network's face detection results
     cv::Mat bboxes(detections.size[2], detections.size[3], CV_32F, detections.ptr<float>());
-    auto faces = PostProcess(bboxes, pad_info[0], pad_info[1], pad_info[2], img_shape);
+    auto faces = PostProcess(bboxes, pad_info[0], pad_info[1], pad_info[2], imgSize);
 
     img.setImage_faceBboxes(faces);
 }
 
 std::vector<std::pair<cv::Rect, float>> 
-FaceDetector::PostProcess(cv::Mat detections, float pad_w, float pad_h, float scale, const cv::Size& img_shape)
+FaceDetector::PostProcess(cv::Mat detections, float pad_w, float pad_h, float scale, const cv::Size& img_size)
 {
     auto clip = [](float n, float lower, float upper) {
         return std::max(lower, std::min(n, upper));
@@ -117,7 +114,7 @@ FaceDetector::PostProcess(cv::Mat detections, float pad_w, float pad_h, float sc
 
             // 1. eliminate bboxes that completely fall outside the frame
             if(x2 < 0 || y2 < 0 
-              || x1 > img_shape.width || y1 > img_shape.height){
+              || x1 > img_size.width || y1 > img_size.height){
                 continue;
             }
 
@@ -128,10 +125,10 @@ FaceDetector::PostProcess(cv::Mat detections, float pad_w, float pad_h, float sc
             // TODO: return the face with the highest cof score if all scores < conf_thresh
 
             //ensures rectangle [tl:(x1, y1), br: (x2, y2)] is inside the frame
-            x1 = clip(x1, 0, img_shape.width);
-            y1 = clip(y1, 0, img_shape.height);
-            x2 = clip(x2, 0, img_shape.width);
-            y2 = clip(y2, 0, img_shape.height);
+            x1 = clip(x1, 0, img_size.width);
+            y1 = clip(y1, 0, img_size.height);
+            x2 = clip(x2, 0, img_size.width);
+            y2 = clip(y2, 0, img_size.height);
 
             float ClippedDx = x2 - x1;
             float ClippedDy = y2 - y1;

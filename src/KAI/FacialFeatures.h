@@ -314,6 +314,11 @@ public:
     // void setSmileDetected(bool smile);
     // bool isSmileDetected() const;
 
+    float getMouthOpenRatio(){
+        float moutOpenRatio = computeMouthOpenRatioDlib();
+        return moutOpenRatio;
+    }
+
     // Method to clear all stored features (for reprocessing)
     void clearFeatures();
 
@@ -388,6 +393,46 @@ private:
         centroid_x = (landmarks.part(62).x() + landmarks.part(66).x()) / 2;
         centroid_y = (landmarks.part(62).y() + landmarks.part(66).y()) / 2;
         FFlocs[FFeatureLocation::FFMouthCenter] = FFeatureLocation(centroid_x, centroid_y);
+    }
+
+    ////////////////////////
+    // helper methods
+    ///////////////////////
+    float computeMouthOpenRatioDlib(){
+    
+        float mouthOpenRatio = 0.0f;
+        
+        // vector from left to right mouth corner
+        float LipLineDx, LipLineDy;
+        // mouth corner to corner dist
+        float corner2corner;
+        // average of upper to lower lip distances
+        double MouthLipDist = 0.0;
+
+        LipLineDx = FFlocs[FFeatureLocation::FFMouthRightCorner].mX
+                    - FFlocs[FFeatureLocation::FFMouthLeftCorner].mX;
+        LipLineDy = FFlocs[FFeatureLocation::FFMouthRightCorner].mY
+                    - FFlocs[FFeatureLocation::FFMouthLeftCorner].mY;
+        
+        cv::Point lipLineVec(LipLineDx, LipLineDy);
+        corner2corner = cv::norm(lipLineVec);
+
+        int iUpLip,iLoLip,iUpLipLast;
+        // for Dlib facial feature points
+        iUpLip = 61, iLoLip = 67, iUpLipLast = 63;
+        for  ( ; iUpLip <= iUpLipLast; iUpLip++, iLoLip-- )
+        {
+            // vector from upper lip to lower lip
+            cv::Point mouthVec;
+            mouthVec = vFFpoints[iLoLip] - vFFpoints[iUpLip];
+
+            // to be valid, mouth vec CROSS lip vec should be positive, otherwise it counts as zero distance
+            if  ( lipLineVec.cross(mouthVec) > 0.0 )
+                MouthLipDist += cv::norm(mouthVec);
+        }
+        // TODO: 3 is for averaging over three top-bottom Fpoints dists? what if one is invalid? why divide by 3?
+        mouthOpenRatio = MouthLipDist / (3.0 * corner2corner);
+        return mouthOpenRatio;
     }
 };
 #endif // FACIALFEATURES_H

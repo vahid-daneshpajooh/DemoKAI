@@ -88,14 +88,13 @@ void MouthOpenDetector::run(Image &img)
         auto pMouthOpen = std::make_shared<MouthOpen>();
         pMouthOpen->openScore = probMouthOpen;
 
-        // TODO: compute mouth open ratio
-        // method 1: parted lips relative to corner-to-corner
-        // e.g., in Dlib 68 landmarks: dist(66,62) / dist(54, 48)
-        auto vFFDlib = fFeatures.getFacialFeatures();
-
+        // compute mouth open ratio
+        float mouthOpenRatio = fFeatures.getMouthOpenRatio();
+        /*
         float partedLips = cv::norm(vFFDlib[66] - vFFDlib[62]);
         float corner2corner = cv::norm(vFFDlib[54] - vFFDlib[48]);
         float mouthOpenRatio = partedLips / corner2corner;
+        */
 
         pMouthOpen->mouthOpenRatio = mouthOpenRatio;
 
