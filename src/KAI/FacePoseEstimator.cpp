@@ -101,7 +101,8 @@ void FacePoseEstimator::run(Image &img)
         std::vector<cv::Point> featurePoints = faceFeature.getFacialFeatures();
         
         // compute dist vector between all feature pairs
-        std::vector<float> distFpairs = computeDistFeaturePairs(featurePoints);
+        float iod = faceFeature.getIOD();
+        std::vector<float> distFpairs = computeDistFeaturePairs(featurePoints, iod);
 
         // Create a cv::Mat object
         // Copy data from the vector to cv::Mat
@@ -133,19 +134,13 @@ void FacePoseEstimator::run(Image &img)
 }
 
 std::vector<float> 
-FacePoseEstimator::computeDistFeaturePairs(std::vector<cv::Point> features){
+FacePoseEstimator::computeDistFeaturePairs(std::vector<cv::Point> features, float IOD){
     // NOTES:
     // 1. INITIAL MODEL USED EUCLIDEAN DISTANCE (L-2 norm) BETWEEN EACH PAIRS OF FACIAL FEATURE POINTS
     // (NOT IMPLEMENTED HERE)
     // 2. REVISED MODEL USES DELTA X AND DELTA Y (L-1 norm) BETWEEN EACH PAIR OF FACIAL FEATURE POINTS, (SKIPPING FACE OUTLINE POINTS)
-    
-    int numFeatues = features.size(); // should be 68 for Dlib
-
-    // compute interocular distance
-	int dx = features[43].x - features[37].x;
-	int dy = features[43].y - features[37].y;
-	float iod = sqrt(dx*dx+dy*dy);
-	float iod_scale = 100 / iod;
+	
+    float iod_scale = 100 / IOD;
     
     // compute dist between all possible feature pairs
     // (excluding the face outline; i.e., Dlib landmarks [0, 16])

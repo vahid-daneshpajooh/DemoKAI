@@ -32,6 +32,10 @@ public:
         imgMat.copyTo(outMat);
     }
 
+    cv::Size getImageSize(){
+        return imgMat.size();
+    }
+
     std::vector<std::pair<cv::Rect, float>> getImage_faceBboxes(){
         
         std::lock_guard<std::mutex> lock(imageMutex); // protect access

@@ -53,7 +53,7 @@ private:
      * @return face boxes with shape: [x, y, w, h]
      */
     std::vector< std::pair<cv::Rect, float> > 
-    PostProcess(cv::Mat detections, float pad_w, float pad_h, float scale, const cv::Size& img_shape);
+    PostProcess(cv::Mat detections, float pad_w, float pad_h, float scale, const cv::Size& img_size);
 
 
 };

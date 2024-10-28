@@ -45,6 +45,6 @@ private:
     // helper functions
     ///
 
-    std::vector<float> computeDistFeaturePairs(std::vector<cv::Point> features);
+    std::vector<float> computeDistFeaturePairs(std::vector<cv::Point> features, float IOD);
 };
 #endif // FACEPOSEESTIMATOR_H

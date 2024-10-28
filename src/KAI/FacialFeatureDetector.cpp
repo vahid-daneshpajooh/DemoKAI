@@ -9,16 +9,16 @@ FacialFeatureDetector::FacialFeatureDetector(const std::string& modelPath) {
 
 void FacialFeatureDetector::run(Image& image) {
 
-    cv::Mat origImg;
-    image.getImage_Mat(origImg);
+    // original image width and height
+    auto imgSize = image.getImageSize();
 
     // resize image to Dlib model's input size
     // [Dlib Bug]: Dlib model doesn't require specific size,
     //       but the dlib::shape_predictor() function
     //       throws SegFault for large images; e.g. 4236 x 3648
-    
     cv::Mat img_resized;
-    float scale = resizeImage(origImg, img_resized, net_inputSize);
+    auto pad_info = image.resizeImage(img_resized, net_inputSize, false); // resize (keep ar w/o padding)
+    float scale = pad_info[2];
 
     // Convert cv image to dlib image format
     dlib::cv_image<dlib::bgr_pixel> dlibImage(img_resized);
@@ -39,7 +39,7 @@ void FacialFeatureDetector::run(Image& image) {
         dlib::full_object_detection landmarks = landmarkPredictor(dlibImage, dlibRect);
         
         // scale landmarks back to original image size
-        adjustLandmarksScale(landmarks, scale, origImg.size());
+        adjustLandmarksScale(landmarks, scale, imgSize);
 
         // extract main facial landmarks (e.g., eye, nose, lips corners)
         FacialFeatures features;
@@ -64,31 +64,6 @@ void FacialFeatureDetector::adjustLandmarksScale(dlib::full_object_detection &la
 
         landmarks.part(i) = dlib::point(fPoint.x, fPoint.y);
     }
-}
-
-float FacialFeatureDetector::resizeImage(const cv::Mat& src,
-                            cv::Mat& dst, const cv::Size& out_size){
-    // input:  1. original image
-    //         2. desired output size
-    //
-    // output: resized image with same aspect ratio as input
-
-    // source and dest. image dimensions
-    // dest = Dlib model's input size (e.g., 500x500)
-    auto in_h = static_cast<float>(src.rows);
-    auto in_w = static_cast<float>(src.cols);
-    float out_h = out_size.height;
-    float out_w = out_size.width;
-
-    // scale factor equal to the min of  [w_in/w_out] or [h_in/h_out]
-    float scale = std::min(out_w / in_w, out_h / in_h);
-
-    // resize image (we maintain aspect ratio)
-    int mid_h = static_cast<int>(in_h * scale);
-    int mid_w = static_cast<int>(in_w * scale);
-    cv::resize(src, dst, cv::Size(mid_w, mid_h));
-
-    return scale;
 }
 
 void FacialFeatureDetector::scaleCoordinates(cv::Point& point, float scale,

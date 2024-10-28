@@ -315,8 +315,11 @@ public:
     // bool isSmileDetected() const;
 
     float getMouthOpenRatio(){
-        float moutOpenRatio = computeMouthOpenRatioDlib();
-        return moutOpenRatio;
+        return computeMouthOpenRatioDlib();
+    }
+
+    float getIOD(){
+        return computeIOD();
     }
 
     // Method to clear all stored features (for reprocessing)
@@ -398,6 +401,20 @@ private:
     ////////////////////////
     // helper methods
     ///////////////////////
+    
+    float computeIOD(){
+        // left eye center
+        float Cx_leftEye = FFlocs[FFeatureLocation::FFLeftEyeCenter].mX;
+        float Cy_leftEye = FFlocs[FFeatureLocation::FFLeftEyeCenter].mY;
+        cv::Point2f C_leftEye(Cx_leftEye, Cy_leftEye);
+
+        float Cx_rightEye = FFlocs[FFeatureLocation::FFRightEyeCenter].mX;
+        float Cy_rightEye = FFlocs[FFeatureLocation::FFRightEyeCenter].mY;
+        cv::Point2f C_rightEye(Cx_rightEye, Cy_rightEye);
+
+        return cv::norm(C_rightEye - C_leftEye);
+    }
+
     float computeMouthOpenRatioDlib(){
     
         float mouthOpenRatio = 0.0f;
@@ -407,7 +424,7 @@ private:
         // mouth corner to corner dist
         float corner2corner;
         // average of upper to lower lip distances
-        double MouthLipDist = 0.0;
+        float MouthLipDist = 0.0;
 
         LipLineDx = FFlocs[FFeatureLocation::FFMouthRightCorner].mX
                     - FFlocs[FFeatureLocation::FFMouthLeftCorner].mX;
