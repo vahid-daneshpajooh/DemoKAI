@@ -219,6 +219,13 @@ public:
 
         // Initialize all auxiliary data 
         vAuxData.resize(AuxData::eNAuxDataID);
+        vAuxData[AuxData::eHeadPose] = std::make_shared<HeadPose>();
+        vAuxData[AuxData::eEyesOpen] = std::make_shared<EyesOpen>();
+        vAuxData[AuxData::eGaze] = std::make_shared<Gaze>();
+        vAuxData[AuxData::eMouthOpen] = std::make_shared<MouthOpen>();
+        vAuxData[AuxData::eSmile] = std::make_shared<Smile>();
+        vAuxData[AuxData::eRedEye] = std::make_shared<RedEye>();
+        vAuxData[AuxData::eEyeglasses] = std::make_shared<Eyeglasses>();
     }
 
     // landmarks, including (eye, mouth, nose) left/right corners and center
@@ -262,6 +269,8 @@ public:
 
     std::vector<float> getFacePose() const {
         
+        // TODO: fix seg fault error
+        //       when vAuxData is not initialized with HeadPose
         auto pHeadPose = getAuxData<HeadPose>(AuxData::eHeadPose);
         
         std::vector<float> RollYawPitch = {360.0f, 360.0f, 360.0f};
