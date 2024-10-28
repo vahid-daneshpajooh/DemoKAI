@@ -73,13 +73,12 @@ void FaceDetector::run(Image &img)
     img.getImage_Mat(imgMat);
     
     // original image width and height
-    int imgWidth = imgMat.cols;
-    int imgHeight = imgMat.rows;
+    auto img_shape = imgMat.size();
 
+    // resize image to fit model's input size
     cv::Mat img_resized;
-    cv::resize(imgMat, img_resized, net_inputSize);
+    std::vector<float> pad_info = img.resizeImage(img_resized, net_inputSize, true); // padded resize
 
-    
     cv::Mat detections;
     cv::Mat blob;
 
@@ -87,28 +86,59 @@ void FaceDetector::run(Image &img)
     faceNet_.setInput(blob, inputName);
     detections = faceNet_.forward(outputName);
 
+    // post-process network's face detection results
     cv::Mat bboxes(detections.size[2], detections.size[3], CV_32F, detections.ptr<float>());
-    
+    auto faces = PostProcess(bboxes, pad_info[0], pad_info[1], pad_info[2], img_shape);
+
+    img.setImage_faceBboxes(faces);
+}
+
+std::vector<std::pair<cv::Rect, float>> 
+FaceDetector::PostProcess(cv::Mat detections, float pad_w, float pad_h, float scale, const cv::Size& img_shape)
+{
+    auto clip = [](float n, float lower, float upper) {
+        return std::max(lower, std::min(n, upper));
+    };
+
     std::vector<std::pair<cv::Rect, float>> faces;
-    for(int i = 0; i < bboxes.rows; i++)
+    for(int i = 0; i < detections.rows; i++)
     {
-        float confidence = bboxes.at<float>(i, 2);
+        float confidence = detections.at<float>(i, 2);
     
         if(confidence > conf_thresh)
         {
             // opencv bbox to represent a face
             cv::Rect2i face;
 
-            int x1 = static_cast<int>(bboxes.at<float>(i, 3) * imgWidth);
-            int y1 = static_cast<int>(bboxes.at<float>(i, 4) * imgHeight);
-            int x2 = static_cast<int>(bboxes.at<float>(i, 5) * imgWidth);
-            int y2 = static_cast<int>(bboxes.at<float>(i, 6) * imgHeight);
+            float x1 = (detections.at<float>(i, 3) * net_inputSize.width - pad_w) / scale;
+            float y1 = (detections.at<float>(i, 4) * net_inputSize.height - pad_h) / scale;
+            float x2 = (detections.at<float>(i, 5) * net_inputSize.width - pad_w) / scale;
+            float y2 = (detections.at<float>(i, 6) * net_inputSize.height - pad_h) / scale;
+
+            // 1. eliminate bboxes that completely fall outside the frame
+            if(x2 < 0 || y2 < 0 
+              || x1 > img_shape.width || y1 > img_shape.height){
+                continue;
+            }
+
+            // 2. ensure at least 90% of bbox's width and height is inside the frame
+            float FullDx = x2 - x1;
+            float FullDy = y2 - y1;
+            
+            // TODO: return the face with the highest cof score if all scores < conf_thresh
 
             //ensures rectangle [tl:(x1, y1), br: (x2, y2)] is inside the frame
-            x1 = std::max(0, std::min(x1, imgWidth - 1));
-            y1 = std::max(0, std::min(y1, imgHeight - 1));
-            x2 = std::max(0, std::min(x2, imgWidth - 1));
-            y2 = std::max(0, std::min(y2, imgHeight - 1));
+            x1 = clip(x1, 0, img_shape.width);
+            y1 = clip(y1, 0, img_shape.height);
+            x2 = clip(x2, 0, img_shape.width);
+            y2 = clip(y2, 0, img_shape.height);
+
+            float ClippedDx = x2 - x1;
+            float ClippedDy = y2 - y1;
+            if  ( (FullDx <= 0.0) || (FullDy <= 0.0)
+                || ((ClippedDx/FullDx) <= 0.9) || ((ClippedDy/FullDy) <= 0.9) ) {
+                    continue;
+            }
 
             face.x = x1;
             face.y = y1;
@@ -118,5 +148,6 @@ void FaceDetector::run(Image &img)
             faces.push_back(std::pair(face, confidence));
         }
     }
-    img.setImage_faceBboxes(faces);
+
+    return faces;
 }

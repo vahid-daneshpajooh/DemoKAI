@@ -96,6 +96,55 @@ public:
         return imageName;
     }
 
+    //////////////////////////////////
+    // Image manipulation functions
+    //////////////////////////////////
+    /***
+     * @brief (Padded) resize
+     * @note  maintains the image aspect ratio.
+     *        Further, pads the image to out_size if instructed (pad = true).
+     * @param src - input image
+     * @param dst - output image
+     * @param out_size - desired output size
+     * @param pad - pads image to ensure output size
+     * @return padding information - pad width, pad height and zoom scale
+     * @note   pad width and height = -1, when param pad = false.
+     */
+    std::vector<float> resizeImage(cv::Mat& dst, const cv::Size& out_size = cv::Size(300, 300),
+                                    bool pad = false) {
+
+        cv::Mat src;
+        imgMat.copyTo(src);
+
+        // source and dest. image dimensions
+        auto in_h = static_cast<float>(src.rows);
+        auto in_w = static_cast<float>(src.cols);
+        float out_h = out_size.height;
+        float out_w = out_size.width;
+
+        // scale factor equal to the min of  [w_in/w_out] or [h_in/h_out]
+        float scale = std::min(out_w / in_w, out_h / in_h);
+
+        // resize image (we maintain aspect ratio)
+        int mid_h = static_cast<int>(in_h * scale);
+        int mid_w = static_cast<int>(in_w * scale);
+        cv::resize(src, dst, cv::Size(mid_w, mid_h));
+
+        // pad image to fit to out_size
+        int top = -1, down = -1, left = -1, right = -1;
+        if(pad){
+            top = (static_cast<int>(out_h) - mid_h) / 2;
+            down = (static_cast<int>(out_h)- mid_h + 1) / 2;
+            left = (static_cast<int>(out_w)- mid_w) / 2;
+            right = (static_cast<int>(out_w)- mid_w + 1) / 2;
+
+            cv::copyMakeBorder(dst, dst, top, down, left, right, cv::BORDER_CONSTANT, cv::Scalar(114, 114, 114));
+        }
+
+        std::vector<float> pad_info{static_cast<float>(left), static_cast<float>(top), scale};
+        return pad_info;
+    }
+
 private:
     
     // Mutex to protect shared image data
@@ -111,7 +160,7 @@ private:
     // Facial Features (landmarks, smile, gaze, eyeglasses, etc)
     // (for all detected faces)
     std::vector<FacialFeatures> vFacialFeatures;
-    
+
     //////////////////////////////////
     // visualization utility functions
     //////////////////////////////////
