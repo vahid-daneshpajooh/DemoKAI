@@ -89,14 +89,9 @@ void MouthOpenDetector::run(Image &img)
         pMouthOpen->openScore = probMouthOpen;
 
         // compute mouth open ratio
-        float mouthOpenRatio = fFeatures.getMouthOpenRatio();
-        /*
-        float partedLips = cv::norm(vFFDlib[66] - vFFDlib[62]);
-        float corner2corner = cv::norm(vFFDlib[54] - vFFDlib[48]);
-        float mouthOpenRatio = partedLips / corner2corner;
-        */
-
-        pMouthOpen->mouthOpenRatio = mouthOpenRatio;
+        // (done in FacialFeatures Class, when MouthOpen aux data requested)
+        // TODO/NOTE: currently, mouthOpenRatio is never computed and stored in AuxData.
+        //            (computed only when getMouthOpenRatio is called in FacialFeatures class)
 
         // Update Aux Data in Facial Features class
         fFeatures.setAuxData<MouthOpen>(pMouthOpen);

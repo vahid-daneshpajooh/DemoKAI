@@ -144,6 +144,25 @@ struct AuxData {
 
 // 1. HeadPose derived from AuxData
 struct HeadPose : public AuxData {
+    // The roll, pitch, and yaw values are degrees in [-180.0,180)
+    // in a right-handed coordinate system with
+    // - positive x to the viewer's right, 
+    // - positive y down (i.e., the ususal image coordinates),
+    // - positive z away from the viewer.
+    //   
+    // When roll == pitch == yaw, the top of the subject's head is up
+	// and the subject is looking out of the image directly at the viewer.
+	// 
+    // Assuming the world's origin O(x,y,z) is locked to the head of the subject,
+    // the Roll, Pitch, and Yaw are defined as follows:
+    //
+	//	- Roll is rotation around the z axis (the z axis points from the nose to the back of the
+	//	  head).  If pitch == yaw == 0, positive roll is clockwise rotation as seen by the viewer.
+	//	- Pitch is rotation around the x axis (the x axis points from the subject's right ear to the
+	//	  subject's left ear).  If roll == yaw == 0, a small positive pitch causes the face to
+	//	  look in the downward direction.
+	//	- Yaw is rotation around the y axis (the y axis points from the head to the feet).  If roll ==
+	//	  pitch == 0, a small positive yaw causes the face to look to the viewer's left.
     float roll;
     float yaw;
     float pitch;
@@ -286,6 +305,17 @@ public:
 
         return pMouthOpen->openScore;
     }
+    float getMouthOpenRatio() const {
+        auto pMouthOpen = getAuxData<MouthOpen>(AuxData::eMouthOpen);
+
+        // compute MouthOpen Ratio (if not available) before returning aux data
+        if(pMouthOpen->mouthOpenRatio == -1){
+            const float ratio = computeMouthOpenRatioDlib();
+            pMouthOpen->mouthOpenRatio = ratio;
+        }
+
+        return pMouthOpen->mouthOpenRatio;
+    }
 
     float isSmileDetected() const {
         auto pSmile = getAuxData<Smile>(AuxData::eSmile);
@@ -311,14 +341,8 @@ public:
     }
 
     // Methods to handle additional features (e.g., smile detection, eye state)
-    // void setSmileDetected(bool smile);
-    // bool isSmileDetected() const;
 
-    float getMouthOpenRatio(){
-        return computeMouthOpenRatioDlib();
-    }
-
-    float getIOD(){
+    float getIOD() {
         return computeIOD();
     }
 
@@ -408,16 +432,17 @@ private:
         float Cy_leftEye = FFlocs[FFeatureLocation::FFLeftEyeCenter].mY;
         cv::Point2f C_leftEye(Cx_leftEye, Cy_leftEye);
 
+        // right eye center
         float Cx_rightEye = FFlocs[FFeatureLocation::FFRightEyeCenter].mX;
         float Cy_rightEye = FFlocs[FFeatureLocation::FFRightEyeCenter].mY;
         cv::Point2f C_rightEye(Cx_rightEye, Cy_rightEye);
 
-        return cv::norm(C_rightEye - C_leftEye);
+        return cv::norm(C_rightEye - C_leftEye); // euclidean dist between left and right eyes
     }
 
-    float computeMouthOpenRatioDlib(){
+    float computeMouthOpenRatioDlib() const {
     
-        float mouthOpenRatio = 0.0f;
+        float mouthOpenRatio = -1.0f;
         
         // vector from left to right mouth corner
         float LipLineDx, LipLineDy;
@@ -447,9 +472,16 @@ private:
             if  ( lipLineVec.cross(mouthVec) > 0.0 )
                 MouthLipDist += cv::norm(mouthVec);
         }
+        
         // TODO: 3 is for averaging over three top-bottom Fpoints dists? what if one is invalid? why divide by 3?
-        mouthOpenRatio = MouthLipDist / (3.0 * corner2corner);
+        // avoid divide by zero case (FFeatureLocation = 0.0)
+        if(corner2corner != 0 ){
+            mouthOpenRatio = MouthLipDist / (3.0 * corner2corner);
+        }
+
         return mouthOpenRatio;
     }
+
+
 };
 #endif // FACIALFEATURES_H

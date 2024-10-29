@@ -228,7 +228,9 @@ private:
 
             // print mouth open prob. for now
             float mouthOpenScore = faceFeatures.isMouthOpen();
+            float mouthOpenRatio = faceFeatures.getMouthOpenRatio();
             std::cout << "Mouth Open Score = " << mouthOpenScore << std::endl;
+            std::cout << "Mouth Open Ratio = " << mouthOpenRatio << std::endl;
 
             // print smile prob. for now
             float smileScore = faceFeatures.isSmileDetected();
