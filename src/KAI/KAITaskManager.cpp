@@ -1,6 +1,9 @@
 #include "KAITaskManager.h"
+
 #include "FaceDetector.h"
 #include "FacialFeatureDetector.h"
+#include "TFLiteFacialFeatureDetector.h"
+
 #include "FacePoseEstimator.h"
 #include "MouthOpenDetector.h"
 #include "SmileDetector.h"
@@ -40,11 +43,27 @@ void KAITaskManager::loadMLConfigs(const std::string config_path)
 
             task = std::unique_ptr<KAITask>(pFaceDetector);
         }
-        else if(str_task == "FacialFeatures"){
-            // read model Dlib file (*.dat)
+        else if(str_task == "FacialFeatures" && module.id == "FFDefault"){
+            // read Dlib model file (*.dat)
             std::string modelPath = module.modelName;
+            
             // pass model to constructor
             task = std::make_unique<FacialFeatureDetector>(modelPath);
+        }
+        else if(str_task == "FacialFeatures" && module.id == "FFTFlowLite"){
+            // read tensorflow lite model file (*.tflite)
+            std::string modelPath = module.modelName;
+            
+            // pass model to constructor
+            TFLiteFacialFeatureDetector* pFacialFeatureDetector = 
+                                        new TFLiteFacialFeatureDetector(modelPath);
+
+            // read other task specific params and initialize model
+            auto params = module.params;
+            pFacialFeatureDetector->init(params);
+
+            // pass model to constructor
+            task = std::unique_ptr<KAITask>(pFacialFeatureDetector);
         }
         else if(str_task == "FacePose"){
             // read model and cfg files (*.pb and *.csv)

@@ -9,8 +9,21 @@ project(DemoKAI)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find OpenCV package
+#######################
+# 3rd party libraries
+#######################
+
+### OpenCV
 find_package(OpenCV REQUIRED)
+
+
+### TensorFlow Lite
+set(TFLite_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tensorflow-lite" CACHE PATH
+ "Directory that contains the TensorFlow-Lite include and lib" )
+
+set(TFLite_INCLUDE_DIRS "${TFLite_PATH}/include")
+set(TFLite_LIBS "${TFLite_PATH}/lib/libtflite.so")
+
 
 # Add source files
 set(SOURCES
@@ -21,8 +34,9 @@ set(SOURCES
 
 	# KAI tasks
     FaceDetector.cpp
-	FacialFeatureDetector.cpp
-	
+	FacialFeatureDetector.cpp # Dlib model (68 landmarks)
+	TFLiteFacialFeatureDetector.cpp # TensorFlow Lite model (468 "Face Mesh" landmarks)
+
 	FacePoseEstimator.cpp
 	MouthOpenDetector.cpp
 	SmileDetector.cpp
@@ -41,8 +55,9 @@ set(HEADERS
 
 	# KAI tasks
 	FaceDetector.h
-	FacialFeatureDetector.h
-	
+	FacialFeatureDetector.h # Dlib model (68 landmarks)
+	TFLiteFacialFeatureDetector.h # TensorFlow Lite model (468 "Face Mesh" landmarks)
+
 	FacePoseEstimator.h
 	MouthOpenDetector.h
 	SmileDetector.h
@@ -54,7 +69,8 @@ set(HEADERS
 	Logger.h
 	
 	Image.h				# Image class
-	FacialFeatures.h
+	FacialFeatures.h	# Facial Features class
+	FaceMeshKeypoints.h # map keypoints to facial landmarks
 	Types.h				# supported types 
 
 )
@@ -66,14 +82,19 @@ set(USE_AVX_INSTRUCTIONS 1) # enable CPU AVX (advanced vector extensions)
 
 add_subdirectory(dlib)
 
-
-# Include OpenCV headers
-include_directories(
-	${OpenCV_INCLUDE_DIRS}
-	)
-
 # Add your executable
 add_executable(KAI-impl ${SOURCES} ${HEADERS})
 
-# Link OpenCV libraries
-target_link_libraries(KAI-impl ${OpenCV_LIBS} dlib::dlib)
+# Include OpenCV and TFLite headers
+target_include_directories(KAI-impl
+	PRIVATE ${OpenCV_INCLUDE_DIRS}
+	PRIVATE ${TFLite_INCLUDE_DIRS}
+)
+
+
+# Link OpenCV and TFLite libraries
+target_link_libraries(KAI-impl
+					PRIVATE ${OpenCV_LIBS}
+					PRIVATE dlib::dlib
+					PRIVATE ${TFLite_LIBS}
+)

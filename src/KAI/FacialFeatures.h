@@ -1,6 +1,8 @@
 #ifndef FACIALFEATURES_H
 #define FACIALFEATURES_H
 
+#include "FaceMeshKeypoints.h"
+
 #include <dlib/image_processing.h>
 #include <opencv2/core/types.hpp>
 
@@ -257,6 +259,35 @@ public:
         return vFFpoints;
     }
 
+    std::vector<cv::Point> getFacialFeatures(const std::string& mode) const {
+        
+        // TODO: complete this method
+        FaceMeshTFLite faceMesh;
+
+        std::vector<cv::Point> vFFs;
+        if(mode == "Dlib-extended"){
+            std::vector<int> idxs;
+
+            auto list = faceMesh.dictKeys;
+            for (const auto& key: list){
+                idxs = faceMesh.getFaceKeypoints(key);
+            }
+        }
+        else if (mode == "Dlib") {
+
+        }
+        else{ // All feature points
+            vFFs = vFFpoints;
+        }
+
+        return vFFs;
+    }
+
+    /**
+     * @brief set facial features detected by Dlib (68 landmarks)
+     * 
+     * @param landmarks - holds facial feature points (x,y)
+     */
     void setFFeaturesFromDlib(const dlib::full_object_detection& landmarks){
         
         vFFpoints.clear();
@@ -266,6 +297,18 @@ public:
 
         // save specific FFpoints as facial landmarks
         setFacialLandmarksFromDlib(landmarks);
+    }
+
+    void setFFeaturesFromTFLite(const std::vector<cv::Point> &landmarks){
+        
+        vFFpoints.clear();
+        vFFpoints = landmarks;
+
+        // TODO:
+        // 1. Add FeaturePointMode "Dlib" : map 468 landmarks down to 68
+        // 2. Add FeaturePointMode "Dlib-extended" (default) : map 468 landmarks down to 118(?) Dlib-like
+        // 3. Fill in facial landmark locations (e.g., eyes, lips, nose)
+
     }
 
     void setFaceBbox(const std::pair<cv::Rect, float>& bbox){
